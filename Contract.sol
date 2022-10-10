@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 contract myContract{
 
     address private owner = msg.sender;
-    uint256 private shopId = 0;
+    uint256 private shopId = 9;
     uint256 private userId = 0;
     uint256 private requestId = 0;
 
@@ -33,7 +33,13 @@ contract myContract{
         uint256 likes;
         uint256 dislikes;
         uint256 point;
-        // uint256 parent; сделать ответы, у обычного кома это shopId у ответа это id 
+    }
+
+    struct Answer{
+        uint256 parent;
+        string text;
+        uint256 likes;
+        uint256 dislikes;
     }
 
     struct Request{
@@ -46,10 +52,22 @@ contract myContract{
     mapping(uint256 => address) private idUserMap;
     mapping(address => string) private userPass;
     mapping(uint256 => Shop) private shopMap;
+    mapping(address => uint256) private adressShopMap;
     mapping(uint256 => Coms[]) private shopCommMap;
     mapping(string => address) private loginMap;
 
-    constructor() {  
+    constructor() {
+        address[] memory empty;
+        shopMap[1] = Shop(1, "Dmitrov", 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, 1000, empty);
+        adressShopMap[0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2] = 1;
+        shopMap[2] = Shop(2, "Kaluga", 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, 900, empty);
+        shopMap[3] = Shop(3, "Moscow", 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, 1050, empty);
+        shopMap[4] = Shop(4, "Ryazan", 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, 700, empty);
+        shopMap[5] = Shop(5, "Samara", 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, 2000, empty);
+        shopMap[6] = Shop(6, "Saint-Petersburg", 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, 2300, empty);
+        shopMap[7] = Shop(7, "Taganrog", 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, 0, empty);
+        shopMap[8] = Shop(8, "Tomsk", 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, 780, empty);
+        shopMap[9] = Shop(9, "Habarovsk", 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, 1500, empty);
     }
 
     Request[] requests;
@@ -130,19 +148,12 @@ contract myContract{
                 }
             }
         }
-            delete requests[_index];
+        delete requests[_index];
     }
 
-    function returRequest() public view returns(Request[] memory){
+    function returnRequest() public view returns(Request[] memory){
         return requests;
     }
-
-    // function registerShop(string memory _city) public isAdmin {
-    //     shopId++;
-    //     address[] memory empty;
-    //     shopMap[shopId] = Shop(shopId, _city, msg.sender, address(msg.sender).balance,empty);
-    // } 
-    // юзелесс 
 
     function addShop(address _shopAddress, string memory _city) public isAdmin {
         shopId++;
@@ -167,7 +178,9 @@ contract myContract{
         shopCommMap[_shopId].push(Coms(_id, _text, 0, 0, _point));
     }
 
-    function an
+    function addAnswer(uint256 _parent, string memory text) public {
+
+    }
 
     function backComm(uint256 _shopId) public view returns(Coms[] memory){
         return shopCommMap[_shopId];
