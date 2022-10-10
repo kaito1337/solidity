@@ -1,133 +1,182 @@
-//SPDX-License-Identifier: UNLICENSED
+//SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
-contract Contract {
-    
+contract myContract{
+
     address private owner = msg.sender;
-    uint256 shopId = 0;
-    
-    struct User {
+    uint256 private shopId = 0;
+    uint256 private userId = 0;
+    uint256 private requestId = 0;
+
+    struct User{
+        uint256 id;
         string login;
-        string password;
+        string name;
         address wallet;
-        bool notBlackList;
+        uint256 role; // 1 - покупатель, 2 - продавец, 3 - админ, 4 - поставщик, 5 - банк
+        uint256 balance;
+        uint256 tempRole;
     }
 
-    struct Shop {
-        uint256 shopId;
-        string title;
-        string location;
-        uint256 profit;
-        uint256 countOfBuyers;
+    struct Shop{
+        uint256 id;
+        string city;
+        address wallet;
+        uint256 balance;
+        address[] employees;
     }
 
-    struct Product { 
-        uint id;
-        string title;
-        uint256 price;
-        string date;
-    }
-
-    struct Coms {
+    struct Coms{
+        uint256 id;
         string text;
-        address[] likes;
-        address[] dis;
+        uint256 likes;
+        uint256 dislikes;
+        uint256 point;
+        // uint256 parent; сделать ответы, у обычного кома это shopId у ответа это id 
+    }
+
+    struct Request{
+        uint256 id;
+        uint256 shopId;
+        address userAddress;
     }
 
     mapping(address => User) private userMap;
-    mapping(address => Shop) public shopMap;
-    mapping(address => Coms) public comsMap;
-    mapping(uint256 => Product[]) private productMap;
+    mapping(uint256 => address) private idUserMap;
+    mapping(address => string) private userPass;
+    mapping(uint256 => Shop) private shopMap;
+    mapping(uint256 => Coms[]) private shopCommMap;
+    mapping(string => address) private loginMap;
 
-    modifier notBlack {
-        require(userMap[msg.sender].notBlackList == false, "You are in blacklist");
+    constructor() {  
+    }
+
+    Request[] requests;
+
+    modifier isOwner(){
+        require(owner == msg.sender, "You are not owner");
         _;
     }
 
-    modifier isOwner() {
-        require(msg.sender == owner, "You are not owner");
+    modifier isNotGuest(){
+        require(userMap[msg.sender].role >= 1, "You are guest");
         _;
     }
 
-    function registerUser(string memory _login, string memory _password) public {
-        require(userMap[msg.sender].wallet == address(0), "User is already created");
-        userMap[msg.sender] = User(_login,_password, msg.sender, false);
+    modifier isAdmin(){
+        require(userMap[msg.sender].role == 3 || owner == msg.sender, "You are not admin");
+        _;
     }
 
-    function authUser(string memory _login, string memory _password) public view notBlack returns(User memory) {
-        require(keccak256(abi.encode(userMap[msg.sender].login)) == keccak256(abi.encode(_login)), "Wrong pair of password and login");
-        require(keccak256(abi.encode(userMap[msg.sender].password)) == keccak256(abi.encode(_password)), "Wrong pair of password and login");
+    modifier isSeller(){
+        require(userMap[msg.sender].role == 2);
+        _;
+    }
+
+    modifier isSellerOrBuyer(){
+        require(userMap[msg.sender].role == 2 || userMap[msg.sender].role == 1 || userMap[msg.sender].tempRole == 1);
+        _;
+    }
+
+    function register(string memory _login, string memory _name, string memory _password) public {
+        userMap[msg.sender] = User(userId++,_login,_name,msg.sender, 1, address(msg.sender).balance, 0);
+        userPass[msg.sender] = _password;
+        idUserMap[userId] = msg.sender;
+        loginMap[_login] = msg.sender;
+    }
+
+    function auth(string memory _login, string memory _password) public view returns(User memory) {
+        require(keccak256(abi.encode(userMap[loginMap[_login]].login)) == keccak256(abi.encode(_login)), "Wrong pair of login and password");
+        require(keccak256(abi.encode(userPass[loginMap[_login]])) == keccak256(abi.encode(_password)), "Wrong pair of login and password");
         return userMap[msg.sender];
     }
-    
-    function transfer(address payable _buyer) public payable notBlack {
-        _buyer.transfer(msg.value);
+
+    function setAdmin(address _address) public isAdmin {
+        userMap[_address].role = 3;
     }
 
-    function contractTransfer() public payable notBlack {
-        
-    }
-    
-    function balanceOf() public view notBlack returns(uint256) {
-        return address(this).balance;
+    function changeRole(address _address, uint256 _role) public isAdmin {
+        userMap[_address].role = _role;
     }
 
-    function registerShop(string memory _title, string memory _location, uint256 _profit, uint256 _countOfBuyers) public notBlack {
-        shopMap[msg.sender] = Shop(shopId++,_title, _location, _profit, _countOfBuyers);
+    function adminToBuyer() public isAdmin{
+        userMap[msg.sender].tempRole = 1;
     }
 
-    function addToBlacklist(address _wallet) public notBlack isOwner {
-        userMap[_wallet].notBlackList = true;
+    function sendRequest(uint256 _shopId) public isSellerOrBuyer{
+        requestId++;
+        if(userMap[msg.sender].id == 1){
+            requests.push(Request(requestId, _shopId, msg.sender));
+        }
+        else{
+            requests.push(Request(requestId, _shopId, msg.sender));
+        }
     }
 
-    function changeOwner(address newOwner) public isOwner {
-        owner = newOwner;
+    function takeRequest(uint256 _index, bool _solut) public isAdmin{
+        User memory _sender = userMap[requests[_index].userAddress];
+        if(_solut){
+            if(_sender.role == 1){
+                userMap[requests[_index].userAddress].role = 2;
+                shopMap[requests[_index].shopId].employees.push(_sender.wallet);
+            }
+            else{
+                _sender.role = 1;
+                for(uint256 i = 0; i < shopMap[requests[_index].shopId].employees.length; i++){
+                    if(shopMap[requests[_index].shopId].employees[i] == _sender.wallet){
+                        delete shopMap[requests[_index].shopId].employees[i];
+                    }
+                }
+            }
+        }
+            delete requests[_index];
     }
 
-    function checkOwner() public view notBlack returns(address) {
-        return owner;
+    function returRequest() public view returns(Request[] memory){
+        return requests;
     }
 
-    function addProduct(uint256 _shopId, string memory _title, uint256 _price, string memory _date) public notBlack {
-        uint256 _id = productMap[_shopId].length;
-        productMap[_shopId].push(Product(_id,_title,_price,_date));
-    }
+    // function registerShop(string memory _city) public isAdmin {
+    //     shopId++;
+    //     address[] memory empty;
+    //     shopMap[shopId] = Shop(shopId, _city, msg.sender, address(msg.sender).balance,empty);
+    // } 
+    // юзелесс 
 
-    function getProduct(uint256 _shopId, uint256 _index) public view notBlack returns (Product memory){
-        return (productMap[_shopId][_index]);
-    }
-
-    function deleteProduct(uint256 _shopId, uint256 _index) public notBlack {
-        delete productMap[_shopId][_index];
-    }
-
-    function backComm(address poster) public notBlack view returns(Coms memory){
-        return comsMap[poster];
-    }
-
-    function addComm(string memory _text) public notBlack{
+    function addShop(address _shopAddress, string memory _city) public isAdmin {
+        shopId++;
         address[] memory empty;
-        comsMap[msg.sender] = Coms(_text, empty, empty );
+        shopMap[shopId] = Shop(shopId, _city, _shopAddress, _shopAddress.balance, empty);
     }
 
-    function like(address _user) public notBlack {
-        for(uint i = 0; i<comsMap[_user].likes.length; i++){
-            require(comsMap[_user].likes[i] != msg.sender, "You are already likes this post");
-        }
-        for(uint i = 0; i<comsMap[_user].dis.length; i++){
-            require(comsMap[_user].dis[i] != msg.sender, "You are already dislikes this post");
-        }
-        comsMap[_user].likes.push(msg.sender);
+    function emplreturn(uint256 _shopId) public view returns (Shop memory){
+        return shopMap[_shopId];
     }
 
-    function dislike(address _user) public notBlack {
-        for(uint i = 0; i<comsMap[_user].dis.length; i++){
-            require(comsMap[_user].dis[i] != msg.sender, "You are already dislikes this post");
+    function deleteShop(uint256 _shopId) public isAdmin {
+        for(uint256 i = 0; i<shopMap[_shopId].employees.length; i++){
+            userMap[shopMap[_shopId].employees[i]].role = 1;
         }
-        for(uint i = 0; i<comsMap[_user].likes.length;i++){
-            require(comsMap[_user].likes[i] != msg.sender, "You are already likes this post");
-        }
-        comsMap[_user].dis.push(msg.sender);
+        delete shopMap[_shopId];
+    }
+
+    function addComm(string memory _text, uint256 _shopId, uint256 _point) public {
+        require(_point <= 10 && _point >= 1, "Point must be in range 1-10");
+        uint256 _id = shopCommMap[_shopId].length;
+        shopCommMap[_shopId].push(Coms(_id, _text, 0, 0, _point));
+    }
+
+    function an
+
+    function backComm(uint256 _shopId) public view returns(Coms[] memory){
+        return shopCommMap[_shopId];
+    }
+
+    function like(uint256 _shopId, uint256 _commId) public isNotGuest {
+        shopCommMap[_shopId][_commId].likes++;
+    }
+    function dislike(uint256 _shopId, uint256 _commId) public isNotGuest {
+        shopCommMap[_shopId][_commId].dislikes++;
     }
 }
