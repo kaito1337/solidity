@@ -7,8 +7,8 @@ import "openzeppelin-solidity/contracts/utils/math/SafeMath.sol";
 contract myContract is ERC20{
     using SafeMath for uint256;
 
-    constructor(uint256 _supply) ERC20("RadioTex", "RTK"){
-       _mint(msg.sender, _supply);
+    constructor(uint256 _amount) ERC20("RadioTex", "RTK"){
+       _mint(msg.sender, _amount);
     }
 
     address[] private stakeholders;
