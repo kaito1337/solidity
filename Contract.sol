@@ -6,7 +6,7 @@ contract myContract{
 
     address private owner = msg.sender;
     uint256 private shopId = 9;
-    uint256 private userId = 0;
+    uint256 private userId = 15;
     uint256 private requestId = 0;
 
     struct User{
@@ -14,9 +14,10 @@ contract myContract{
         string login;
         string name;
         address wallet;
-        uint256 role; // 1 - покупатель, 2 - продавец, 3 - админ, 4 - поставщик, 5 - банк
+        uint256 role; // 1 - покупатель, 2 - продавец, 3 - админ, 4 - поставщик, 5 - банк, 6 - магаз
         uint256 balance;
         uint256 tempRole;
+        uint256 shopId;
     }
 
     struct Shop{
@@ -48,30 +49,77 @@ contract myContract{
         address userAddress;
     }
 
-    mapping(address => User) private userMap;
+    mapping(address => User) public userMap;
     mapping(uint256 => address) private idUserMap;
     mapping(address => string) private userPass;
     mapping(uint256 => Shop) private shopMap;
-    mapping(address => uint256) private adressShopMap;
+    mapping(address => uint256) private addressShopMap;
+    mapping(uint256 => Answer[]) public answerComsMap;
     mapping(uint256 => Coms[]) private shopCommMap;
     mapping(string => address) private loginMap;
 
     constructor() {
         address[] memory empty;
-        shopMap[1] = Shop(1, "Dmitrov", 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, 1000, empty);
-        adressShopMap[0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2] = 1;
-        shopMap[2] = Shop(2, "Kaluga", 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, 900, empty);
-        shopMap[3] = Shop(3, "Moscow", 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, 1050, empty);
-        shopMap[4] = Shop(4, "Ryazan", 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, 700, empty);
-        shopMap[5] = Shop(5, "Samara", 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, 2000, empty);
-        shopMap[6] = Shop(6, "Saint-Petersburg", 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, 2300, empty);
-        shopMap[7] = Shop(7, "Taganrog", 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, 0, empty);
-        shopMap[8] = Shop(8, "Tomsk", 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, 780, empty);
-        shopMap[9] = Shop(9, "Habarovsk", 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, 1500, empty);
+
+        shopMap[1] = Shop(1, "Dmitrov", 0x6941Cc84FeBa95693f02d9dDD601aF7a87286dc5, 0x6941Cc84FeBa95693f02d9dDD601aF7a87286dc5.balance, empty);
+        addressShopMap[0x6941Cc84FeBa95693f02d9dDD601aF7a87286dc5] = 1;
+        userMap[0x6941Cc84FeBa95693f02d9dDD601aF7a87286dc5] = User(1, "shop1", "shop1", 0x6941Cc84FeBa95693f02d9dDD601aF7a87286dc5, 6, 0x6941Cc84FeBa95693f02d9dDD601aF7a87286dc5.balance, 0, 1 );
+        userPass[0x6941Cc84FeBa95693f02d9dDD601aF7a87286dc5] = "123";
+
+        shopMap[2] = Shop(2, "Kaluga", 0x120633837bF06006906E5446C1D40b3Fa9F69fc9, 0x120633837bF06006906E5446C1D40b3Fa9F69fc9.balance, empty);
+        addressShopMap[0x120633837bF06006906E5446C1D40b3Fa9F69fc9] = 2;
+        userMap[0x120633837bF06006906E5446C1D40b3Fa9F69fc9] = User(2, "shop2", "shop2", 0x120633837bF06006906E5446C1D40b3Fa9F69fc9, 6, 0x120633837bF06006906E5446C1D40b3Fa9F69fc9.balance, 0, 2 );
+        userPass[0x120633837bF06006906E5446C1D40b3Fa9F69fc9] = "123";
+
+        shopMap[3] = Shop(3, "Moscow", 0xE347b0bEdaC7C6A169eEDBCC3060002D5A304d83, 0xE347b0bEdaC7C6A169eEDBCC3060002D5A304d83.balance, empty);
+        addressShopMap[0xE347b0bEdaC7C6A169eEDBCC3060002D5A304d83] = 3;
+        userMap[0xE347b0bEdaC7C6A169eEDBCC3060002D5A304d83] = User(3, "shop3", "shop3", 0xE347b0bEdaC7C6A169eEDBCC3060002D5A304d83, 6, 0xE347b0bEdaC7C6A169eEDBCC3060002D5A304d83.balance, 0, 3 );
+        userPass[0xE347b0bEdaC7C6A169eEDBCC3060002D5A304d83] = "123";
+
+        shopMap[4] = Shop(4, "Ryazan", 0xdb7D80FD92Fc7440E12D01292Cb20934230Cd9ED, 0xdb7D80FD92Fc7440E12D01292Cb20934230Cd9ED.balance, empty);
+        addressShopMap[0xdb7D80FD92Fc7440E12D01292Cb20934230Cd9ED] = 4;
+        userMap[0xdb7D80FD92Fc7440E12D01292Cb20934230Cd9ED] = User(4, "shop4", "shop4", 0xdb7D80FD92Fc7440E12D01292Cb20934230Cd9ED, 6, 0xdb7D80FD92Fc7440E12D01292Cb20934230Cd9ED.balance, 0, 4 );
+        userPass[0xdb7D80FD92Fc7440E12D01292Cb20934230Cd9ED] = "123";
+
+        shopMap[5] = Shop(5, "Samara", 0x394CAA0Dd589BCe60Ce9d6c20489Be3119a36477, 0x394CAA0Dd589BCe60Ce9d6c20489Be3119a36477.balance, empty);
+        addressShopMap[0x394CAA0Dd589BCe60Ce9d6c20489Be3119a36477] = 5;
+        userMap[0x394CAA0Dd589BCe60Ce9d6c20489Be3119a36477] = User(5, "shop5", "shop5", 0x394CAA0Dd589BCe60Ce9d6c20489Be3119a36477, 6, 0x394CAA0Dd589BCe60Ce9d6c20489Be3119a36477.balance, 0, 5 );
+        userPass[0x394CAA0Dd589BCe60Ce9d6c20489Be3119a36477] = "123";
+
+        shopMap[6] = Shop(6, "Saint-Petersburg", 0xfFa5165e6BeB49B54c5FdE625168bc46A2D27f3D, 0xfFa5165e6BeB49B54c5FdE625168bc46A2D27f3D.balance, empty);
+        addressShopMap[0xfFa5165e6BeB49B54c5FdE625168bc46A2D27f3D] = 6;
+        userMap[0xfFa5165e6BeB49B54c5FdE625168bc46A2D27f3D] = User(6, "shop6", "shop6", 0xfFa5165e6BeB49B54c5FdE625168bc46A2D27f3D, 6, 0xfFa5165e6BeB49B54c5FdE625168bc46A2D27f3D.balance, 0, 6 );
+        userPass[0xfFa5165e6BeB49B54c5FdE625168bc46A2D27f3D] = "123";
+
+        shopMap[7] = Shop(7, "Taganrog", 0xFf54975884064A7fF8De55305e00609d46B11128, 0xFf54975884064A7fF8De55305e00609d46B11128.balance, empty);
+        addressShopMap[0xFf54975884064A7fF8De55305e00609d46B11128] = 7;
+        userMap[0xFf54975884064A7fF8De55305e00609d46B11128] = User(7, "shop7", "shop7", 0xFf54975884064A7fF8De55305e00609d46B11128, 6, 0xFf54975884064A7fF8De55305e00609d46B11128.balance, 0, 7 );
+        userPass[0xFf54975884064A7fF8De55305e00609d46B11128] = "123";
+
+        shopMap[8] = Shop(8, "Tomsk", 0x17525B8B19D6b3068b07a5Cb777423b7D491C7F7, 0x17525B8B19D6b3068b07a5Cb777423b7D491C7F7.balance, empty);
+        addressShopMap[0x17525B8B19D6b3068b07a5Cb777423b7D491C7F7] = 8;
+        userMap[0x17525B8B19D6b3068b07a5Cb777423b7D491C7F7] = User(8, "shop8", "shop8", 0x17525B8B19D6b3068b07a5Cb777423b7D491C7F7, 6, 0x17525B8B19D6b3068b07a5Cb777423b7D491C7F7.balance, 0, 8 );
+        userPass[0x17525B8B19D6b3068b07a5Cb777423b7D491C7F7] = "123";
+
+        shopMap[9] = Shop(9, "Habarovsk", 0x10837A646FeD756C36f6c47F28649aCEb1Cf6aC4, 0x10837A646FeD756C36f6c47F28649aCEb1Cf6aC4.balance, empty);
+        addressShopMap[0x10837A646FeD756C36f6c47F28649aCEb1Cf6aC4] = 9;
+        userMap[0x10837A646FeD756C36f6c47F28649aCEb1Cf6aC4] = User(9, "shop9", "shop9", 0x10837A646FeD756C36f6c47F28649aCEb1Cf6aC4, 6, 0x10837A646FeD756C36f6c47F28649aCEb1Cf6aC4.balance, 0, 9 );
+        userPass[0x10837A646FeD756C36f6c47F28649aCEb1Cf6aC4] = "123";
+        
+        userMap[0x75F43Cb032f2D932C1c8bD23062A9b41A03Be7C2] = User(10, "bank", "Bank", 0x75F43Cb032f2D932C1c8bD23062A9b41A03Be7C2, 5, 0x75F43Cb032f2D932C1c8bD23062A9b41A03Be7C2.balance, 0, 0);
+        userPass[0x75F43Cb032f2D932C1c8bD23062A9b41A03Be7C2] = "123";
+        userMap[0xe7aE610A9ed8E984E92559C162607b8CCFdC73CA] = User(11, "goldfish", "Gold Fish", 0xe7aE610A9ed8E984E92559C162607b8CCFdC73CA, 4, 0xe7aE610A9ed8E984E92559C162607b8CCFdC73CA.balance, 0, 0);
+        userPass[0xe7aE610A9ed8E984E92559C162607b8CCFdC73CA] = "123";
+        userMap[0xe61ebaAa099E80E73976293eB9A66E3DABA20322] = User(12, "ivan", "Ivanov Ivan Ivanovich", 0xe61ebaAa099E80E73976293eB9A66E3DABA20322, 3, 0xe61ebaAa099E80E73976293eB9A66E3DABA20322.balance, 0, 0);
+        userPass[0xe61ebaAa099E80E73976293eB9A66E3DABA20322] = "123";
+        userMap[0xF1035cf4D5BBB0C81C0C7F4E7291ED35f6bE2A15] = User(13, "semen", "Semenov Semen Semenovich", 0xF1035cf4D5BBB0C81C0C7F4E7291ED35f6bE2A15, 2, 0xF1035cf4D5BBB0C81C0C7F4E7291ED35f6bE2A15.balance, 0, 1);
+        userPass[0xF1035cf4D5BBB0C81C0C7F4E7291ED35f6bE2A15] = "123";
+        userMap[0xA4babd4e0ecB7Cb53D7dDA240F7a215CF25f9449] = User(14, "petr", "Petrov Petr Petrovich", 0xA4babd4e0ecB7Cb53D7dDA240F7a215CF25f9449, 1, 0xA4babd4e0ecB7Cb53D7dDA240F7a215CF25f9449.balance, 0, 0);
+        userPass[0xA4babd4e0ecB7Cb53D7dDA240F7a215CF25f9449] = "123";
     }
 
     Request[] requests;
-
+    uint256[] dolgi;
     modifier isOwner(){
         require(owner == msg.sender, "You are not owner");
         _;
@@ -87,6 +135,11 @@ contract myContract{
         _;
     }
 
+    modifier isBank(){
+        require(userMap[msg.sender].role == 5);
+        _;
+    }
+
     modifier isSeller(){
         require(userMap[msg.sender].role == 2);
         _;
@@ -97,8 +150,13 @@ contract myContract{
         _;
     }
 
+    modifier isShop(){
+        require(userMap[msg.sender].role == 6);
+        _;
+    }
+
     function register(string memory _login, string memory _name, string memory _password) public {
-        userMap[msg.sender] = User(userId++,_login,_name,msg.sender, 1, address(msg.sender).balance, 0);
+        userMap[msg.sender] = User(userId++,_login,_name,msg.sender, 1, address(msg.sender).balance, 0, 0);
         userPass[msg.sender] = _password;
         idUserMap[userId] = msg.sender;
         loginMap[_login] = msg.sender;
@@ -134,16 +192,19 @@ contract myContract{
 
     function takeRequest(uint256 _index, bool _solut) public isAdmin{
         User memory _sender = userMap[requests[_index].userAddress];
+        uint256 _shopId = requests[_index].shopId;
         if(_solut){
             if(_sender.role == 1){
                 userMap[requests[_index].userAddress].role = 2;
-                shopMap[requests[_index].shopId].employees.push(_sender.wallet);
+                userMap[requests[_index].userAddress].shopId = _shopId;                
+                shopMap[_shopId].employees.push(_sender.wallet);
             }
             else{
-                _sender.role = 1;
+                userMap[requests[_index].userAddress].role = 1;
+                userMap[requests[_index].userAddress].shopId = 0;
                 for(uint256 i = 0; i < shopMap[requests[_index].shopId].employees.length; i++){
-                    if(shopMap[requests[_index].shopId].employees[i] == _sender.wallet){
-                        delete shopMap[requests[_index].shopId].employees[i];
+                    if(shopMap[_shopId].employees[i] == _sender.wallet){
+                        delete shopMap[_shopId].employees[i];
                     }
                 }
             }
@@ -161,8 +222,8 @@ contract myContract{
         shopMap[shopId] = Shop(shopId, _city, _shopAddress, _shopAddress.balance, empty);
     }
 
-    function emplreturn(uint256 _shopId) public view returns (Shop memory){
-        return shopMap[_shopId];
+    function emplreturn(uint256 _shopId) public view returns (address[] memory){
+        return shopMap[_shopId].employees;
     }
 
     function deleteShop(uint256 _shopId) public isAdmin {
@@ -173,23 +234,43 @@ contract myContract{
     }
 
     function addComm(string memory _text, uint256 _shopId, uint256 _point) public {
+        require((userMap[msg.sender].role == 1), "You are not buyer");
         require(_point <= 10 && _point >= 1, "Point must be in range 1-10");
         uint256 _id = shopCommMap[_shopId].length;
         shopCommMap[_shopId].push(Coms(_id, _text, 0, 0, _point));
     }
 
-    function addAnswer(uint256 _parent, string memory text) public {
-
+    function addAnswer(uint256 _parent, uint256 _shopId, string memory _text) public {
+        require((userMap[msg.sender].shopId == _shopId ) || (userMap[msg.sender].role == 1), "You are not buyer or seller of this shop");
+        uint256 _id = answerComsMap[_parent].length;
+        answerComsMap[_parent].push(Answer(_id, _text, 0, 0));
     }
 
     function backComm(uint256 _shopId) public view returns(Coms[] memory){
         return shopCommMap[_shopId];
     }
 
-    function like(uint256 _shopId, uint256 _commId) public isNotGuest {
+    function backAnswers(uint256 _parent) public view returns(Answer[] memory){
+        return answerComsMap[_parent];
+    }
+
+    function likeComm(uint256 _shopId, uint256 _commId) public isNotGuest {
         shopCommMap[_shopId][_commId].likes++;
     }
-    function dislike(uint256 _shopId, uint256 _commId) public isNotGuest {
+
+    function dislikeComm(uint256 _shopId, uint256 _commId) public isNotGuest {
         shopCommMap[_shopId][_commId].dislikes++;
+    }
+
+    function likeAnswer(uint256 _parent)
+
+    function requestDolg() public isShop {
+       dolgi.push(addressShopMap[msg.sender]);
+    }
+
+    function giveDolg(uint256 _index) public payable isBank(){
+        require(msg.value == 1000 ether);
+        _index++;
+        payable(shopMap[dolgi[_index]].wallet).transfer(msg.value);
     }
 }
