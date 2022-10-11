@@ -195,12 +195,7 @@ contract myContract{
 
     function sendRequest(uint256 _shopId) public isSellerOrBuyer{
         requestId++;
-        if(userMap[msg.sender].id == 1){
-            requests.push(Request(requestId, _shopId, msg.sender));
-        }
-        else{
-            requests.push(Request(requestId, _shopId, msg.sender));
-        }
+        requests.push(Request(requestId, _shopId, msg.sender));
     }
 
     function takeRequest(uint256 _index, bool _solut) public isAdmin{
