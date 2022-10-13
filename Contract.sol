@@ -224,8 +224,16 @@ contract myContract{
         userMap[msg.sender].tempRole = 1;
     }
 
+    function buyerToAdmin() public isAdmin{
+        userMap[msg.sender].tempRole = 3;
+    }
+
     function sellerToBuyer() public isSeller{
         userMap[msg.sender].tempRole = 1;
+    }
+
+    function buyerToSeller() public isSeller{
+        userMap[msg.sender].tempRole = 2;
     }
 
     function sendRequest(uint256 _shopId) public isSellerOrBuyer{
