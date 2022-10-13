@@ -53,6 +53,7 @@ contract myContract{
     Request[] requests;
     uint256[] dolgi;
     string[] admins;
+    Shop[] shops;
 
     mapping(address => User) public userMap;
     mapping(uint256 => address) private idUserMap;
@@ -139,13 +140,17 @@ contract myContract{
         loginMap["petr"] = 0xA4babd4e0ecB7Cb53D7dDA240F7a215CF25f9449;
         admins.push("ivan");
         shopMap[1].employees.push(0xF1035cf4D5BBB0C81C0C7F4E7291ED35f6bE2A15);
-    }
 
-    modifier isOwner(){
-        require(owner == msg.sender, "You are not owner");
-        _;
+        shops.push(shopMap[1]);
+        shops.push(shopMap[2]);
+        shops.push(shopMap[3]);
+        shops.push(shopMap[4]);
+        shops.push(shopMap[5]);
+        shops.push(shopMap[6]);
+        shops.push(shopMap[7]);
+        shops.push(shopMap[8]);
+        shops.push(shopMap[9]);
     }
-
     modifier isNotGuest(){
         require(userMap[msg.sender].role >= 1, "You are guest");
         _;
@@ -162,12 +167,12 @@ contract myContract{
     }
 
     modifier isSeller(){
-        require(userMap[msg.sender].role == 2, "You are not seller");
+        require(userMap[msg.sender].role == 2 || userMap[msg.sender].tempRole == 2, "You are not seller");
         _;
     }
 
     modifier isBuyer(){
-        require(userMap[msg.sender].role == 1 || userMap[msg.sender].tempRole == 1, "You are not buyer/seller");
+        require(userMap[msg.sender].role == 1 || userMap[msg.sender].tempRole == 1, "You are not buyer");
         _;
     }
 
@@ -199,15 +204,27 @@ contract myContract{
         admins.push(userMap[_address].login);
     }
 
-    function returnAdmins() public isAdmin view returns(string[] memory){
+    function returnAdmins() public view isAdmin returns(string[] memory){
         return admins;
     }
 
+    function shopreturn() public view isAdmin returns (Shop[] memory){
+        return shops;
+    }
+
+
     function changeRole(address _address, uint256 _role) public isAdmin {
+        if(userMap[_address].role == 3){
+            userMap[_address].tempRole == _role;
+        }
         userMap[_address].role = _role;
     }
 
     function adminToBuyer() public isAdmin{
+        userMap[msg.sender].tempRole = 1;
+    }
+
+    function sellerToBuyer() public isSeller{
         userMap[msg.sender].tempRole = 1;
     }
 
@@ -246,10 +263,9 @@ contract myContract{
         shopId++;
         address[] memory empty;
         shopMap[shopId] = Shop(shopId, _city, _shopAddress, empty);
-    }
-
-    function emplreturn(uint256 _shopId) public view isShop returns (address[] memory){
-        return shopMap[_shopId].employees;
+        userMap[_shopAddress].role = 6;
+        userMap[_shopAddress].shopId = shopId;
+        shops.push(shopMap[shopId]); 
     }
 
     function deleteShop(uint256 _shopId) public isAdmin {
@@ -258,6 +274,7 @@ contract myContract{
             userMap[shopMap[_shopId].employees[i]].shopId = 0;
         }
         delete shopMap[_shopId];
+        userMap[shopMap[_shopId].wallet].role = 1;
     }
 
     function addComm(string memory _text, uint256 _shopId, uint256 _point) public isBuyer {
