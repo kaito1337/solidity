@@ -8,7 +8,6 @@ contract myContract{
     uint256 private shopId = 9;
     uint256 private userId = 15;
     uint256 private requestId = 0;
-
     struct User{
         uint256 id;
         string login;
@@ -29,7 +28,7 @@ contract myContract{
 
     struct Coms{
         uint256 id;
-        address commentator;
+        uint256 parent;
         string text;
         uint256 likes;
         uint256 dislikes;
@@ -38,7 +37,7 @@ contract myContract{
 
     struct Answer{
         uint256 id;
-        address commentator;
+        uint256 parent;
         string text;
         uint256 likes;
         uint256 dislikes;
@@ -63,8 +62,8 @@ contract myContract{
     mapping(address => uint256) private addressShopMap;
     mapping(uint256 => Answer[]) public answerComsMap;
     mapping(uint256 => Coms[]) private shopCommMap;
-    mapping(address => Coms[]) private userCommMap;
-    mapping(address => Answer[]) private userAnswerMap;
+    mapping(uint256 => Coms[]) private userCommMap;
+    mapping(uint256 => Answer[]) private userAnswerMap;
 
     constructor() {
         address[] memory empty;
@@ -151,12 +150,6 @@ contract myContract{
         shops.push(shopMap[8]);
         shops.push(shopMap[9]);
     }
-
-    modifier isOwner(){
-        require(owner == msg.sender, "You are not owner");
-        _;
-    }
-
     modifier isNotGuest(){
         require(userMap[msg.sender].role >= 1, "You are guest");
         _;
@@ -173,12 +166,12 @@ contract myContract{
     }
 
     modifier isSeller(){
-        require(userMap[msg.sender].role == 2, "You are not seller");
+        require(userMap[msg.sender].role == 2 || userMap[msg.sender].tempRole == 2, "You are not seller");
         _;
     }
 
     modifier isBuyer(){
-        require(userMap[msg.sender].role == 1 || userMap[msg.sender].tempRole == 1, "You are not buyer/seller");
+        require(userMap[msg.sender].role == 1 || userMap[msg.sender].tempRole == 1, "You are not buyer");
         _;
     }
 
@@ -210,16 +203,36 @@ contract myContract{
         admins.push(userMap[_address].login);
     }
 
-    function returnAdmins() public isAdmin view returns(string[] memory){
+    function returnAdmins() public view isAdmin returns(string[] memory){
         return admins;
     }
 
+    function shopreturn() public view isAdmin returns (Shop[] memory){
+        return shops;
+    }
+
+
     function changeRole(address _address, uint256 _role) public isAdmin {
+        if(userMap[_address].role == 3){
+            userMap[_address].tempRole == _role;
+        }
         userMap[_address].role = _role;
     }
 
     function adminToBuyer() public isAdmin{
         userMap[msg.sender].tempRole = 1;
+    }
+
+    function buyerToAdmin() public isAdmin{
+        userMap[msg.sender].tempRole = 3;
+    }
+
+    function sellerToBuyer() public isSeller{
+        userMap[msg.sender].tempRole = 1;
+    }
+
+    function buyerToSeller() public isSeller{
+        userMap[msg.sender].tempRole = 2;
     }
 
     function sendRequest(uint256 _shopId) public isSellerOrBuyer{
@@ -257,11 +270,9 @@ contract myContract{
         shopId++;
         address[] memory empty;
         shopMap[shopId] = Shop(shopId, _city, _shopAddress, empty);
-        shops.push(shopMap[shopId]);
-    }
-
-    function emplreturn(uint256 _shopId) public view isShop returns (address[] memory){
-        return shopMap[_shopId].employees;
+        userMap[_shopAddress].role = 6;
+        userMap[_shopAddress].shopId = shopId;
+        shops.push(shopMap[shopId]); 
     }
 
     function deleteShop(uint256 _shopId) public isAdmin {
@@ -270,21 +281,21 @@ contract myContract{
             userMap[shopMap[_shopId].employees[i]].shopId = 0;
         }
         delete shopMap[_shopId];
-        delete shops[_shopId-1];
+        userMap[shopMap[_shopId].wallet].role = 1;
     }
 
     function addComm(string memory _text, uint256 _shopId, uint256 _point) public isBuyer {
         require(_point <= 10 && _point >= 1, "Point must be in range 1-10");
         uint256 _id = shopCommMap[_shopId].length;
-        shopCommMap[_shopId].push(Coms(_id,msg.sender, _text, 0, 0, _point));
-        userCommMap[msg.sender].push(Coms(_id, msg.sender, _text, 0, 0, _point));
+        shopCommMap[_shopId].push(Coms(_id,userMap[msg.sender].id, _text, 0, 0, _point));
+        userCommMap[userMap[msg.sender].id].push(Coms(_id,userMap[msg.sender].id, _text, 0, 0, _point));
     }
 
     function addAnswer(uint256 _parent, uint256 _shopId, string memory _text) public {
         require((userMap[msg.sender].shopId == _shopId ) || (userMap[msg.sender].role == 1), "You are not buyer or seller of this shop");
         uint256 _id = answerComsMap[_parent].length;
-        answerComsMap[_parent].push(Answer(_id,msg.sender, _text, 0, 0));
-        userAnswerMap[msg.sender].push(Answer(_id,msg.sender, _text, 0, 0));
+        answerComsMap[_parent].push(Answer(_id,userMap[msg.sender].id, _text, 0, 0));
+        userAnswerMap[userMap[msg.sender].id].push(Answer(_id,userMap[msg.sender].id, _text, 0, 0));
     }
 
     function backComm(uint256 _shopId) public view isShop returns(Coms[] memory){
