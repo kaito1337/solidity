@@ -8,6 +8,7 @@ contract myContract{
     uint256 private shopId = 9;
     uint256 private userId = 15;
     uint256 private requestId = 0;
+
     struct User{
         uint256 id;
         string login;
