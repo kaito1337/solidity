@@ -8,7 +8,6 @@ contract myContract{
     uint256 private shopId = 9;
     uint256 private userId = 15;
     uint256 private requestId = 0;
-
     struct User{
         uint256 id;
         string login;
@@ -193,10 +192,10 @@ contract myContract{
         loginMap[_login] = msg.sender;
     }
 
-    function auth(string memory _login, string memory _password) public view returns(User memory) {
+    function auth(string memory _login, string memory _password) public view returns(User memory, Coms[] memory, Answer[] memory) {
         require(keccak256(abi.encode(userMap[loginMap[_login]].login)) == keccak256(abi.encode(_login)), "Wrong pair of login and password");
         require(keccak256(abi.encode(userPass[loginMap[_login]])) == keccak256(abi.encode(_password)), "Wrong pair of login and password");
-        return userMap[msg.sender];
+        return (userMap[loginMap[_login]], userCommMap[userMap[msg.sender].id], userAnswerMap[userMap[msg.sender].id]);
     }
 
     function setAdmin(address _address) public isAdmin {
@@ -212,6 +211,9 @@ contract myContract{
         return shops;
     }
 
+    function emplreturn(uint256 _id) external view returns (address[] memory){
+        return shopMap[_id].employees;
+    }
 
     function changeRole(address _address, uint256 _role) public isAdmin {
         if(userMap[_address].role == 3){
@@ -283,6 +285,7 @@ contract myContract{
         }
         delete shopMap[_shopId];
         userMap[shopMap[_shopId].wallet].role = 1;
+        delete shops[_shopId-1];
     }
 
     function addComm(string memory _text, uint256 _shopId, uint256 _point) public isBuyer {
@@ -299,11 +302,11 @@ contract myContract{
         userAnswerMap[userMap[msg.sender].id].push(Answer(_id,userMap[msg.sender].id, _text, 0, 0));
     }
 
-    function backComm(uint256 _shopId) public view isShop returns(Coms[] memory){
+    function backComm(uint256 _shopId) public view returns(Coms[] memory){
         return shopCommMap[_shopId];
     }
 
-    function backAnswers(uint256 _parent) public view isShop returns(Answer[] memory){
+    function backAnswers(uint256 _parent) public view returns(Answer[] memory){
         return answerComsMap[_parent];
     }
 
