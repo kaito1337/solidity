@@ -9,20 +9,20 @@ contract Contract is ERC20("cmonToken", "CMT"){
     uint256 etap1 = block.timestamp;
     uint256 etap2 = etap1 + 3 minutes;
     uint256 etap3 = etap2 + 2 minutes;
-    uint256 etap4 = etap3 + 5 minutes;
+    uint256 etap4 = 0;
 
     address inv1 = 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2;
     address inv2 = 0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db;
     address inv3 = 0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB;
-    address rab1 = 0x617F2E2fD72FD9D5503197092aC168c91465E7f2;
-    uint256 summa = 30*(10**decimals());
+    address dev1 = 0x617F2E2fD72FD9D5503197092aC168c91465E7f2;
+    uint256 summa = 200000*(10**decimals());
 
     struct User{
         string login;
         address wallet;
         uint256 balance;
         bool white;
-        bool razrab;
+        bool dev;
     }
 
     constructor(){
@@ -46,7 +46,7 @@ contract Contract is ERC20("cmonToken", "CMT"){
     mapping(string => address) public userLoginMap;
     mapping(string => string) public userPassMap;
     mapping(address => bool) public userWhiteMap;
-    mapping(address => bool) public userIsRab;
+    mapping(address => bool) public userIsDev;
 
     function register(string memory _login, string memory _password) public{
         userMap[msg.sender] = User(_login, msg.sender, balanceOf(msg.sender), false, false);
@@ -71,27 +71,26 @@ contract Contract is ERC20("cmonToken", "CMT"){
         delete whitelist[_index];
     }
 
-    function takeTokens() public isRab{
-        require(block.timestamp == 4 minutes || block.timestamp == 7 minutes || block.timestamp == 10 minutes || block.timestamp == 13 minutes, "Rano eshe");
+    function takeTokens() public isDev{
         transferFrom(admin, msg.sender, 10000*(10**decimals()));
         userMap[msg.sender].balance = balanceOf(msg.sender);
     }
 
     function buyToken() public payable isWhite{
         uint256 tokenPrice = 1 ether;
-        if(block.timestamp < etap4 && summa >= msg.value/tokenPrice * decimals()){
+        if(block.timestamp >= etap4){
+            tokenPrice = 2 ether;
+            payable(admin).transfer(msg.value);
+            transferFrom(admin, msg.sender, msg.value/tokenPrice* decimals());
+        }
+        else if(summa >= msg.value/tokenPrice * decimals()){
             payable(admin).transfer(msg.value);
             transferFrom(admin, msg.sender, msg.value/tokenPrice * decimals());
             summa -= msg.value/tokenPrice*decimals();
         }
         else{
-            // анлаки братан токенов нет
+            revert("Net tokenov");
         }
-        if(block.timestamp >= etap4){
-            tokenPrice = 2 ether;
-        }
-        payable(admin).transfer(msg.value);
-        transferFrom(admin, msg.sender, msg.value/tokenPrice* decimals());
         userMap[msg.sender].balance = balanceOf(msg.sender);
     }
 
@@ -109,8 +108,8 @@ contract Contract is ERC20("cmonToken", "CMT"){
         _;
     }
 
-    modifier isRab() {
-        require(userIsRab[msg.sender] == true);
+    modifier isDev() {
+        require(userIsDev[msg.sender] == true);
         _;
     }
 
