@@ -18,8 +18,8 @@ contract Contract is ERC20("cmonToken", "CMT"){
     address dev2 = 0x17F6AD8Ef982297579C203069C1DbfFE4348c372;
     address dev3 = 0x5c6B0f7Bf3E7ce046039Bd8FABdfD3f9F5021678;
 
-    uint256 summa = 200000*(10**decimals());
     uint256 dec = 10**decimals();
+    uint256 summa = 200000*dec;
 
     struct User{
         string login;
@@ -61,7 +61,6 @@ contract Contract is ERC20("cmonToken", "CMT"){
     mapping(address => User) public userMap;
     mapping(string => address) public userLoginMap;
     mapping(string => string) public userPassMap;
-    mapping(address => bool) public userWhiteMap;
     mapping(address => bool) public userIsDev;
     mapping(address => Dev) public devMap;
 
@@ -79,11 +78,14 @@ contract Contract is ERC20("cmonToken", "CMT"){
         whitelist.push(msg.sender);
     }
 
+    function requests() public view isAdmin returns (address[] memory){
+        return whitelist;
+    }
+
     function takeRequest(uint256 _index, bool _solut) public isAdmin {
         if(_solut){
             userMap[whitelist[_index]].white = true;
             whitelist.push(whitelist[_index]);
-            userWhiteMap[whitelist[_index]] = true;
         }
         delete whitelist[_index];
     }
@@ -113,7 +115,7 @@ contract Contract is ERC20("cmonToken", "CMT"){
         if(block.timestamp >= etap2){
             tokenPrice = 2 ether;
             payable(admin).transfer(msg.value);
-            transferFrom(admin, msg.sender, (msg.value/tokenPrice) *dec);
+            transferFrom(admin, msg.sender, (msg.value/tokenPrice) * dec);
         }
         else if(summa >= msg.value/tokenPrice * dec && block.timestamp >= etap0){
             payable(admin).transfer(msg.value);
@@ -136,7 +138,7 @@ contract Contract is ERC20("cmonToken", "CMT"){
     }
 
     modifier isWhite(){
-        require((userWhiteMap[msg.sender] == true || block.timestamp >= etap2), "You are not white");
+        require((userMap[msg.sender].white == true || block.timestamp >= etap2), "You are not white");
         _;
     }
 
