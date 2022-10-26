@@ -186,6 +186,7 @@ contract myContract{
     }
 
     function register(string memory _login, string memory _name, string memory _password) public {
+        require(loginMap[_login] == address(0), "User already created" );
         userMap[msg.sender] = User(userId++,_login,_name,msg.sender, 1, address(msg.sender).balance, 0, 0);
         userPass[msg.sender] = _password;
         idUserMap[userId] = msg.sender;
