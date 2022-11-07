@@ -292,6 +292,7 @@ contract myContract{
         }
         delete shopMap[_shopId];
         userMap[shopMap[_shopId].wallet].role = 1;
+        userMap[shopMap[_shopId].wallet].tempRole = 1;
         delete shops[_shopId-1];
     }
 
