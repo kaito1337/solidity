@@ -3,12 +3,6 @@ import cors from "cors";
 
 const app = express();
 
-let userId = 14;
-let shopId = 9;
-let requestId = 0;
-let commId = 0;
-let answerId = 0;
-
 let users = [
 {
     "id": 1, 
@@ -246,55 +240,64 @@ let shops = [{
     "id": 1,
     "city": "Dmitrov",
     "employees": ["semen"],
-    "login": "shop1"
+    "login": "shop1",
+    "rate": 0
 },
 {
     "id": 2,
     "city": "Kaluga",
     "employees": [],
-    "login": "shop2"
+    "login": "shop2",
+    "rate": 0
 },
 {
     "id": 3,
     "city": "Moscow",
     "employees": [],
-    "login": "shop3"
+    "login": "shop3",
+    "rate": 0
 },
 {
     "id": 4,
     "city": "Ryazan",
     "employees": [],
-    "login": "shop4"
+    "login": "shop4",
+    "rate": 0
 },
 {
     "id": 5,
     "city": "Samara",
     "employees": [],
-    "login": "shop5"
+    "login": "shop5",
+    "rate": 0
 },
 {
     "id": 6,
     "city": "Saint-Petersburg",
     "employees": [],
-    "login": "shop6"
+    "login": "shop6",
+    "rate": 0
 },
 {
     "id": 7,
     "city": "Taganrog",
     "employees": [],
-    "login": "shop7"
+    "login": "shop7",
+    "rate": 0
 },
 {
     "id": 8,
     "city": "Tomsk",
     "employees": [],
-    "login": "shop8"
+    "login": "shop8",
+    "rate": 0
 },
 {
     "id": 9,
     "city": "Habarovsk",
     "employees": [],
-    "login": "shop9"
+    "login": "shop9",
+    "rate": 0
 }
 ];
 
@@ -302,21 +305,64 @@ let admins = ["ivan"];
 
 let requests = [{}];
 
-let coms = [{}];
+let coms = [
+{
+    "text": "Быстрое обслуживание",
+    "id": 1,
+    "parent": 1,
+    "point": 9,
+    "login": "petr",
+    "likes": 15,
+    "dislikes": 1,
+    "answers": [{
+        "text": "А я долго ждал(((",
+        "id": 1,
+        "login": "nikola",
+        "point": 2,
+        "likes": 0,
+        "dislikes": 11
+    }]
+
+},
+{
+    "text": "Быстрвввое обслуживание",
+    "id": 1,
+    "parent": 2,
+    "point": 9,
+    "login": "petr",
+    "likes": 15,
+    "dislikes": 1,
+    "answers": [{
+        "text": "А я долго ждал(((",
+        "id": 1,
+        "login": "nikola",
+        "point": 2,
+        "likes": 0,
+        "dislikes": 11
+    }]
+}
+];
 
 let loans = [];
-
-let answers = [{}];
 
 let products = [
 {
     "title": "Apple",
     "manufacturer": "China",
-    "date": 050421,
+    "date": "5/4/21",
     "shelfLife": 30,
     "temperature": 30,
     "izm": "kilogramm", // unit
     "price": 0.5,
+}
+];
+
+let delRequests = [
+{
+    "shopId": 2,
+    "title": "Apple",
+    "count": 20,
+    "price": 5,
 }
 ];
 
@@ -329,7 +375,8 @@ app.get("/", (req, res) => {
 
 app.post('/reg', (req, res) => {
     const { login, name, pass } = req.body;
-    users.push({ "id": userId++, "login": login, "name": name, "pass": pass, "role": 1, "balance": 0, "tempRole": 0, "shopId": 0 });
+    let id = users.length;
+    users.push({ "id": id, "login": login, "name": name, "pass": pass, "role": 1, "balance": 0, "tempRole": 0, "shopId": 0 });
     return res.status(200).json({ message: "User created" });
 })
 app.post('/auth', (req, res) => {
@@ -354,10 +401,6 @@ app.post('/setAdmin', (req, res) => {
 
 app.get('/getAdmins', (req,res) => {
     return res.status(200).json({ message: "Admins: ", admins });
-})
-
-app.get('/getShops', (req,res) => {
-    return res.status(200).json({ message: "Shops: ", shops });
 })
 
 app.get('/getShops', (req,res) => {
@@ -431,11 +474,12 @@ app.post('/buyerToSeller', (req,res) => {
 app.post('/addShop', (req,res) => {
     const {login, city} = req.body;
     const index = users.findIndex((el) => el.login == login );
+    let id = shops.length;
     if(index == -1){
         return res.status(500).json({ error: "User not found"});
     }
     users[index].role = 6;
-    shops.push({ "id": shopId++, "city": city, "employees": [], "login": users[index].login });
+    shops.push({ "id": id, "city": city, "employees": [], "login": users[index].login });
     return res.status(200).json({ message: "Success added shop # ", shopId});
 })
 
@@ -456,8 +500,9 @@ app.post('/deleteShop', (req, res) => {
 })
 
 app.post('/sendRequest', (req, res) => {
-    const {id, login} = req.body;
-    requests.push({"id": requestId++, "login": login, "shopId": id});
+    const {shopId, login} = req.body;
+    let id = requests.length;
+    requests.push({"id": id , "login": login, "shopId": shopId});
     return res.status(200).json({message: "Success"});
 })
 
@@ -493,12 +538,12 @@ app.get('/getReq', (req,res) => {
 })
 
 app.post('/addComm', (req, res) => {
-    const { text, id, point, login} = req.body;
+    const { text, shopId, point, login} = req.body;
+    let id = coms.length;
     if( !(point <= 10 && point >= 1)){
         return res.status(500).json({ error: "Wrong point"});
     }
-
-    coms.push({ "id": commId++, "text": text, "shopId": id, "likes": 0, "dislikes": 0, "point": point, "sender": login });
+    coms.push({text, id, "parent": shopId, point, login, "likes": 0, "dislikes": 0, "answers": [{}]})
     return res.status(200).json({ message: "Comm has been added"});
 })
 
@@ -542,43 +587,51 @@ app.post('/giveLoan', (req, res) => {
 })
 
 app.post('/addAnswer', (req,res) => {
-    const {parent, text, login} = req.body;
-    const index = coms.findIndex((el) => el.id == parent);
+    const {id, text, login, point} = req.body;
+    const index = coms.findIndex((el) => el.id == id);
     if(index == -1){
         return res.status(500).json({error: "Comment not found"});
     }
-    answers.push({"id": answerId++, "sender": login, "parent": parent, "text": text, "likes": 0, "dislikes": 0})
-
+    if( !(point <= 10 && point >= 1)){
+        return res.status(500).json({ error: "Wrong point"});
+    }
+    const user = users.find((el) => el.login == login);
+    if(user.role == 2){
+        point = 0;
+    }
+    coms[id].answers.push({"text": text, "login": login, "point": point, "likes": 0, "dislikes": 0 })
+    return res.status(200).json({message: "Success added a answer"})
 })
 
 app.post('/likeAns', (req,res) => {
-    const {id} = req.body;
-    const index = answers.findIndex((el) => el.id == id);
+    const {id, parent} = req.body;
+    const index = coms.findIndex((el) => el.id == parent);
     if(index == -1){
-        return res.status(500).json({ error: "Answer not found"});
+        return res.status(500).json({ error: "Parent comm not found"});
     }
-    answers[index].likes++;
+
+    coms[parent].answers[id].likes++;
     return res.status(500).json({message: "Like has been added"});
 })
 
 app.post('/dislikeAns', (req,res) => {
-    const {id} = req.body;
-    const index = answers.findIndex((el) => el.id == id);
+    const {id, parent} = req.body;
+    const index = coms.findIndex((el) => el.id == parent);
     if(index == -1){
-        return res.status(500).json({ error: "Answer not found"});
+        return res.status(500).json({ error: "Parent comm not found"});
     }
-    answers[index].dislikes++;
-    return res.status(500).json({message: "Dislike has been added"});
+
+    coms[parent].answers[id].dislikes++;
+    return res.status(500).json({message: "Like has been added"});
 })
 
 app.get('/getAnswers', (req, res) => {
-    const {parent} = req.query.parent;
-    const index = coms.findIndex((el) => el.parent == parent);
+    const {id} = req.query.id;
+    const index = coms.findIndex((el) => el.id == id);
     if(index == -1){
         return res.status(500).json({error: "Comment not found"});
     }
-    const answers = answers.map((el) => el.parent == parent);
-    return res.status(200).json({answers});
+    return res.status(200).json(coms[id].answers);
 })
 
 app.post('/createProduct', (req, res) => {
@@ -591,7 +644,44 @@ app.get('/getProducts', (req, res) => {
     return res.status(200).json({products});
 })
 
-app.get('/getRate', (req, res) => {
+app.post('/getRate', (req, res) => {
+    const idShop = req.body;
+    const index = shops.findIndex((el) => el.id == idShop);
+    if(index == -1){
+        return res.status(500).json({error: "Shop not found"});
+    }
+    const commArray = coms.filter((el) => el.parent == idShop);
+    if(commArray.length == 0){
+        return res.status(200).json({message: "Rate = 0"});
+    }
+    let sumOfComm = 0;
+    let sumOfAns = 0;
+    let counter = 0;
+    for(let i = 0; i < commArray.length; i++){
+        if(commArray[i].likes >= 10 && commArray[i].point !== 0 && commArray[i].likes > commArray[i].dislikes){
+            sumOfComm += commArray[i].point * (commArray[i].likes/(commArray[i].likes+commArray[i].dislikes));
+            for(let j = 0; j < commArray[i].answers.length; j++){
+                if(commArray[i].answers[j].likes >= 10 && commArray[i].answers[j].point !== 0 && commArray[i].answers[j].likes > commArray[i].answers[j].dislikes){
+                sumOfAns += commArray[i].answers[j].point * (commArray[i].answers[j].likes/(commArray[i].answers[j].likes+commArray[i].answers[j].dislikes))
+                counter++
+                }
+            }
+            counter++
+        }
+    }
+    const rate = Math.round((sumOfComm + sumOfAns) / counter * 100) / 100;
+    shops[index].rate = rate;
+    return res.status(200).json(`Rate = ${rate}`);
 })
-
+app.post('/requestDelivery', (req, res) => {
+    const {shopId, title, count} = req.body;
+    const product = products.find((el) => el.title == title);
+    if(product){
+        let cof = count <= 100 ? 1 : count <= 1000 ? 0.95 : 0.9
+        let price = (product.price - (product.price*shops[shopId].rate)/100)*count*cof
+        delRequests.push({shopId, title, count, price});
+        return res.status(500).json({message: "Success added request"});
+    }
+    return res.status(500).json({error: "Product not found"})
+})
 app.listen(3000, () => console.log("Server started on port 3000"))
