@@ -253,7 +253,7 @@ let shops = [{
 {
     "id": 3,
     "city": "Moscow",
-    "employees": [],
+    "employees": ["ugin"],
     "login": "shop3",
     "rate": 0
 },
@@ -267,7 +267,7 @@ let shops = [{
 {
     "id": 5,
     "city": "Samara",
-    "employees": [],
+    "employees": ["dima"],
     "login": "shop5",
     "rate": 0
 },
@@ -281,14 +281,14 @@ let shops = [{
 {
     "id": 7,
     "city": "Taganrog",
-    "employees": [],
+    "employees": ["vasya"],
     "login": "shop7",
     "rate": 0
 },
 {
     "id": 8,
     "city": "Tomsk",
-    "employees": [],
+    "employees": ["igor"],
     "login": "shop8",
     "rate": 0
 },
@@ -307,8 +307,25 @@ let requests = [{}];
 
 let coms = [
 {
-    "text": "Быстрое обслуживание",
+    "text": "Отличное качество товара!",
     "id": 1,
+    "parent": 1,
+    "point": 10,
+    "login": "10",
+    "likes": 25,
+    "dislikes": 0,
+    "answers": [{
+        "text": "подтверждаю",
+        "id": 1,
+        "login": "petr",
+        "point": 9,
+        "likes": 20,
+        "dislikes": 2
+    }]
+},
+{
+    "text": "Быстрое обслуживание",
+    "id": 2,
     "parent": 1,
     "point": 9,
     "login": "petr",
@@ -321,39 +338,90 @@ let coms = [
         "point": 2,
         "likes": 0,
         "dislikes": 11
+    },
+    {
+        "text": "Магазин приносит свои извинения",
+        "id": 2,
+        "login": "semen",
+        "point": 0,
+        "likes": 40,
+        "dislikes": 15
     }]
-
 },
 {
-    "text": "Быстрвввое обслуживание",
-    "id": 1,
-    "parent": 2,
-    "point": 9,
-    "login": "petr",
-    "likes": 15,
-    "dislikes": 1,
+    "text": "Ничего особенного",
+    "id": 3,
+    "parent": 3,
+    "point": 5,
+    "login": "roman",
+    "likes": 3,
+    "dislikes": 20,
     "answers": [{
-        "text": "А я долго ждал(((",
+        "text": "Не согласен с вами, всё супер!",
         "id": 1,
-        "login": "nikola",
-        "point": 2,
-        "likes": 0,
-        "dislikes": 11
+        "login": "petr",
+        "point": 10,
+        "likes": 15,
+        "dislikes": 0
     }]
-}
-];
+},
+{
+    "text": "Спасибо мне всё понравилось!",
+    "id": 4,
+    "parent": 3,
+    "point": 8,
+    "login": "alex",
+    "likes": 23,
+    "dislikes": 1,
+    "answers":[{
+        "text": "И мне!",
+        "id": 1,
+        "login": "roman",
+        "point": 9,
+        "likes": 36,
+        "dislikes": 5
+    }]
+},
+{
+    "text": "Мне нахамил продавец.",
+    "id": 5,
+    "parent": 8,
+    "point": 1,
+    "login": "alex",
+    "likes": 10,
+    "dislikes": 2,
+    "answers":[{
+        "text": "Поддерживаю",
+        "id": 1,
+        "login": "petr",
+        "point": 2,
+        "likes": 11,
+        "dislikes": 0
+    }]
+},
+{
+    "text": "Сервис на троечку",
+    "id": 6,
+    "parent": 8,
+    "point": 3,
+    "login": "oleg",
+    "likes": 15,
+    "dislikes": 2,
+    "answers":[{
+    }]
+}];
 
 let loans = [];
 
 let products = [
 {
-    "title": "Apple",
+    "title": "Crev",
     "manufacturer": "China",
     "date": "5/4/21",
     "shelfLife": 30,
     "temperature": 30,
     "izm": "kilogramm", // unit
-    "price": 0.5,
+    "price": 0.03,
 }
 ];
 
@@ -645,12 +713,13 @@ app.get('/getProducts', (req, res) => {
 })
 
 app.post('/getRate', (req, res) => {
-    const idShop = req.body;
-    const index = shops.findIndex((el) => el.id == idShop);
+    const { shopId } = req.body;
+
+    const index = shops.findIndex((el) => el.id == shopId);
     if(index == -1){
         return res.status(500).json({error: "Shop not found"});
     }
-    const commArray = coms.filter((el) => el.parent == idShop);
+    const commArray = coms.filter((el) => el.parent == shopId);
     if(commArray.length == 0){
         return res.status(200).json({message: "Rate = 0"});
     }
@@ -671,17 +740,27 @@ app.post('/getRate', (req, res) => {
     }
     const rate = Math.round((sumOfComm + sumOfAns) / counter * 100) / 100;
     shops[index].rate = rate;
+    console.log(shops[index])
     return res.status(200).json(`Rate = ${rate}`);
 })
 app.post('/requestDelivery', (req, res) => {
     const {shopId, title, count} = req.body;
     const product = products.find((el) => el.title == title);
-    if(product){
-        let cof = count <= 100 ? 1 : count <= 1000 ? 0.95 : 0.9
-        let price = (product.price - (product.price*shops[shopId].rate)/100)*count*cof
-        delRequests.push({shopId, title, count, price});
-        return res.status(500).json({message: "Success added request"});
+    const shop = shops.find((el) => el.id == shopId);
+    console.log(shop)
+    if(shop){
+        if(product){
+            let cof = count <= 100 ? 1 : count <= 1000 ? 0.95 : 0.9
+            let price = Math.round((product.price - (product.price*shop.rate)/100)*count*cof * 100000)/100000;
+            delRequests.push({shopId, title, count, price});
+            return res.status(200).json({message: `Success added a request, price = ${price}`});
+        }
+        return res.status(500).json({error: "Product not found"})
     }
-    return res.status(500).json({error: "Product not found"})
+    return res.status(500).json({error: "Shop not found"})
+})
+
+app.get('/getDelReq', (req, res) => {
+    return res.status(200).json({delRequests});
 })
 app.listen(3000, () => console.log("Server started on port 3000"))
