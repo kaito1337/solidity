@@ -435,7 +435,8 @@ let deliveryRequests = [
     "title": "Apple",
     "count": 20,
     "price": 5,
-    "status": false
+    "status": false,
+    "deliveryTemperature": [],
 }
 ];
 
@@ -746,6 +747,28 @@ app.post('/getRate', (req, res) => {
     return res.status(200).json(`Rate = ${rate}`);
 })
 
+function getDeliveryTemperature(index){
+    const product = products.find((el) => el.title == deliveryRequests[index].title);
+    for(let i = 0; i < 5; i++){
+        let temperature = Math.random(product.minTemperature, product.maxTemperature);
+        deliveryRequests[index].deliveryTemperature.push(temperature);
+    }
+}
+
+function checkTemperatureOut(index){
+    const product = products.find((el) => el.title == deliveryRequests[index].title);
+    const discountCounter = 0;
+    for (let i of deliveryRequests[index].deliveryTemperature){
+        if(i < product.minTemperature || i > product.maxTemperature){
+            discountCounter++;
+        }
+    }
+    if(discountCounter !== 0){
+        deliveryRequests[index].price -= deliveryRequests[index].price * (discountCounter*0.1);
+    }
+    
+}
+
 app.post('/requestDelivery', (req, res) => {
     const {shopId, title, count} = req.body;
     const product = products.find((el) => el.title == title);
@@ -755,7 +778,7 @@ app.post('/requestDelivery', (req, res) => {
         if(product){
             let cof = count <= 100 ? 1 : count <= 1000 ? 0.95 : 0.9
             let price = Math.ceil((product.price - (product.price*shop.rate)/100)*count*cof * 100000)/100000;
-            deliveryRequests.push({shopId, title, count, price, status: false });
+            deliveryRequests.push({shopId, title, count, price, status: false, deliveryTemperature: [] });
             return res.status(200).json({message: `Success added a request, price = ${price}`});
         }
         return res.status(500).json({error: "Product not found"})
@@ -767,14 +790,27 @@ app.get('/getDelivery', (req, res) => {
     return res.status(200).json({deliveryRequests});
 })
 
-app.post('/acceptDelivery', (req, res) => {
+app.post('/acceptPrice', (req, res) => {
     const {solution, shopId} = req.body;
     const index = deliveryRequests.findIndex((el) => el.shopId == shopId);
     if(index == -1){
         return res.status(500).json({error: "Request not found"})
     }
+    if(solution){
     deliveryRequests[index].status = solution;
-    return res.status(200).json({message: "Request accepted" })
+    getDeliveryTemperature(index);
+    checkTemperatureOut(index);
+    return res.status(200).json({message: "Price accepted" })
+    }else{
+        deliveryRequests.splice(index, 1);
+        return res.status(200).json({message: "Delivery canceled"});
+    }
+})
+
+app.post('/acceptDelivery', (req, res) => {
+    const {solution, shopId} = req.body;
+    const delivery = deliveryRequests.find((el) => el.shopId == shopId);
+
 })
 
 app.listen(3000, () => console.log("Server started on port 3000"))
