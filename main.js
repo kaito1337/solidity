@@ -3,6 +3,9 @@ import cors from "cors";
 
 const app = express();
 
+app.use(cors());
+app.use(express.json())
+
 let users = [
 {
     "id": 1, 
@@ -99,10 +102,10 @@ let users = [
     "login": "shop10" ,
     "name": "shop10" ,
     "pass": "123" ,
+    "shopId": 10 , 
     "role": 6 ,
     "balance": 0 ,
     "tempRole": 6 ,
-    "shopId": 10 , 
 },
 {
     "id": 11 ,
@@ -415,27 +418,27 @@ let loans = [];
 
 let products = [
 {
-    "title": "Crev",
-    "manufacturer": "China",
+    "title": "Креветка",
+    "manufacturer": "Россия",
     "date": "5/4/21",
     "shelfLife": 30,
-    "temperature": 30,
-    "izm": "kilogramm", // unit
+    "minTemperature": -20,
+    "maxTemperature": -5,
+    "izm": "КГ", // unit
     "price": 0.03,
 }
 ];
 
-let delRequests = [
+let deliveryRequests = [
 {
     "shopId": 2,
     "title": "Apple",
     "count": 20,
     "price": 5,
+    "status": false
 }
 ];
 
-app.use(cors());
-app.use(express.json())
 
 app.get("/", (req, res) => {
     res.status(200).json({ message: "Hello Express" })
@@ -601,7 +604,7 @@ app.post('/takeRequest', (req, res) => {
     return res.status(200).json({message: "Answer for request has been added"})
 })
 
-app.get('/getReq', (req,res) => {
+app.get('/getRequests', (req,res) => {
     return res.status(200).json({ requests });
 })
 
@@ -615,7 +618,7 @@ app.post('/addComm', (req, res) => {
     return res.status(200).json({ message: "Comm has been added"});
 })
 
-app.post('/likeCom', (req,res) => {
+app.post('/likeComm', (req,res) => {
     const {id} = req.body;
     const index = coms.findIndex((el) => el.id == id);
     if(index == -1){
@@ -625,7 +628,7 @@ app.post('/likeCom', (req,res) => {
     return res.status(500).json({message: "Like has been added"});
 })
 
-app.post('/dislikeCom', (req,res) => {
+app.post('/dislikeComm', (req,res) => {
     const {id} = req.body;
     const index = coms.findIndex((el) => el.id == id);
     if(index == -1){
@@ -671,7 +674,7 @@ app.post('/addAnswer', (req,res) => {
     return res.status(200).json({message: "Success added a answer"})
 })
 
-app.post('/likeAns', (req,res) => {
+app.post('/likeAnswer', (req,res) => {
     const {id, parent} = req.body;
     const index = coms.findIndex((el) => el.id == parent);
     if(index == -1){
@@ -682,7 +685,7 @@ app.post('/likeAns', (req,res) => {
     return res.status(500).json({message: "Like has been added"});
 })
 
-app.post('/dislikeAns', (req,res) => {
+app.post('/dislikeAnswer', (req,res) => {
     const {id, parent} = req.body;
     const index = coms.findIndex((el) => el.id == parent);
     if(index == -1){
@@ -738,11 +741,11 @@ app.post('/getRate', (req, res) => {
             counter++
         }
     }
-    const rate = Math.round((sumOfComm + sumOfAns) / counter * 100) / 100;
+    const rate = Math.ceil((sumOfComm + sumOfAns) / counter * 100) / 100;
     shops[index].rate = rate;
-    console.log(shops[index])
     return res.status(200).json(`Rate = ${rate}`);
 })
+
 app.post('/requestDelivery', (req, res) => {
     const {shopId, title, count} = req.body;
     const product = products.find((el) => el.title == title);
@@ -751,8 +754,8 @@ app.post('/requestDelivery', (req, res) => {
     if(shop){
         if(product){
             let cof = count <= 100 ? 1 : count <= 1000 ? 0.95 : 0.9
-            let price = Math.round((product.price - (product.price*shop.rate)/100)*count*cof * 100000)/100000;
-            delRequests.push({shopId, title, count, price});
+            let price = Math.ceil((product.price - (product.price*shop.rate)/100)*count*cof * 100000)/100000;
+            deliveryRequests.push({shopId, title, count, price, status: false });
             return res.status(200).json({message: `Success added a request, price = ${price}`});
         }
         return res.status(500).json({error: "Product not found"})
@@ -760,7 +763,18 @@ app.post('/requestDelivery', (req, res) => {
     return res.status(500).json({error: "Shop not found"})
 })
 
-app.get('/getDelReq', (req, res) => {
-    return res.status(200).json({delRequests});
+app.get('/getDelivery', (req, res) => {
+    return res.status(200).json({deliveryRequests});
 })
+
+app.post('/acceptDelivery', (req, res) => {
+    const {solution, shopId} = req.body;
+    const index = deliveryRequests.findIndex((el) => el.shopId == shopId);
+    if(index == -1){
+        return res.status(500).json({error: "Request not found"})
+    }
+    deliveryRequests[index].status = solution;
+    return res.status(200).json({message: "Request accepted" })
+})
+
 app.listen(3000, () => console.log("Server started on port 3000"))
