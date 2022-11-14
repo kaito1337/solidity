@@ -68,77 +68,78 @@ contract myContract{
     constructor() {
         address[] memory empty;
 
-        shopMap[1] = Shop(1, "Dmitrov", 0x6941Cc84FeBa95693f02d9dDD601aF7a87286dc5, empty);
-        addressShopMap[0x6941Cc84FeBa95693f02d9dDD601aF7a87286dc5] = 1;
-        userMap[0x6941Cc84FeBa95693f02d9dDD601aF7a87286dc5] = User(1, "shop1", "shop1", 0x6941Cc84FeBa95693f02d9dDD601aF7a87286dc5, 6, 0x6941Cc84FeBa95693f02d9dDD601aF7a87286dc5.balance, 6, 1 );
-        userPass[0x6941Cc84FeBa95693f02d9dDD601aF7a87286dc5] = "123";
-        loginMap["shop1"] = 0x6941Cc84FeBa95693f02d9dDD601aF7a87286dc5;
+        shopMap[1] = Shop(1, "Dmitrov", 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, empty);
+        addressShopMap[0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266] = 1;
+        userMap[0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266] = User(1, "shop1", "shop1", 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, 6, 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266.balance, 6, 1 );
+        userPass[0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266] = "123";
+        loginMap["shop1"] = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
 
-        shopMap[2] = Shop(2, "Kaluga", 0x120633837bF06006906E5446C1D40b3Fa9F69fc9, empty);
-        addressShopMap[0x120633837bF06006906E5446C1D40b3Fa9F69fc9] = 2;
-        userMap[0x120633837bF06006906E5446C1D40b3Fa9F69fc9] = User(2, "shop2", "shop2", 0x120633837bF06006906E5446C1D40b3Fa9F69fc9, 6, 0x120633837bF06006906E5446C1D40b3Fa9F69fc9.balance, 6, 2 );
-        userPass[0x120633837bF06006906E5446C1D40b3Fa9F69fc9] = "123";
-        loginMap["shop2"] = 0x120633837bF06006906E5446C1D40b3Fa9F69fc9;
+        shopMap[2] = Shop(2, "Kaluga", 0x70997970C51812dc3A010C7d01b50e0d17dc79C8, empty);
+        addressShopMap[0x70997970C51812dc3A010C7d01b50e0d17dc79C8] = 2;
+        userMap[0x70997970C51812dc3A010C7d01b50e0d17dc79C8] = User(2, "shop2", "shop2", 0x70997970C51812dc3A010C7d01b50e0d17dc79C8, 6, 0x70997970C51812dc3A010C7d01b50e0d17dc79C8.balance, 6, 2 );
+        userPass[0x70997970C51812dc3A010C7d01b50e0d17dc79C8] = "123";
+        loginMap["shop2"] = 0x70997970C51812dc3A010C7d01b50e0d17dc79C8;
 
-        shopMap[3] = Shop(3, "Moscow", 0xE347b0bEdaC7C6A169eEDBCC3060002D5A304d83, empty);
-        addressShopMap[0xE347b0bEdaC7C6A169eEDBCC3060002D5A304d83] = 3;
-        userMap[0xE347b0bEdaC7C6A169eEDBCC3060002D5A304d83] = User(3, "shop3", "shop3", 0xE347b0bEdaC7C6A169eEDBCC3060002D5A304d83, 6, 0xE347b0bEdaC7C6A169eEDBCC3060002D5A304d83.balance, 6, 3 );
-        userPass[0xE347b0bEdaC7C6A169eEDBCC3060002D5A304d83] = "123";
-        loginMap["shop3"] = 0xE347b0bEdaC7C6A169eEDBCC3060002D5A304d83;
+        shopMap[3] = Shop(3, "Moscow", 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC, empty);
+        addressShopMap[0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC] = 3;
+        userMap[0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC] = User(3, "shop3", "shop3", 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC, 6, 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC.balance, 6, 3 );
+        userPass[0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC] = "123";
+        loginMap["shop3"] = 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC;
 
-        shopMap[4] = Shop(4, "Ryazan", 0xdb7D80FD92Fc7440E12D01292Cb20934230Cd9ED, empty);
-        addressShopMap[0xdb7D80FD92Fc7440E12D01292Cb20934230Cd9ED] = 4;
-        userMap[0xdb7D80FD92Fc7440E12D01292Cb20934230Cd9ED] = User(4, "shop4", "shop4", 0xdb7D80FD92Fc7440E12D01292Cb20934230Cd9ED, 6, 0xdb7D80FD92Fc7440E12D01292Cb20934230Cd9ED.balance, 6, 4 );
-        userPass[0xdb7D80FD92Fc7440E12D01292Cb20934230Cd9ED] = "123";
-        loginMap["shop4"] = 0xdb7D80FD92Fc7440E12D01292Cb20934230Cd9ED;
+        shopMap[4] = Shop(4, "Ryazan", 0x90F79bf6EB2c4f870365E785982E1f101E93b906, empty);
+        addressShopMap[0x90F79bf6EB2c4f870365E785982E1f101E93b906] = 4;
+        userMap[0x90F79bf6EB2c4f870365E785982E1f101E93b906] = User(4, "shop4", "shop4", 0x90F79bf6EB2c4f870365E785982E1f101E93b906, 6, 0x90F79bf6EB2c4f870365E785982E1f101E93b906.balance, 6, 4 );
+        userPass[0x90F79bf6EB2c4f870365E785982E1f101E93b906] = "123";
+        loginMap["shop4"] = 0x90F79bf6EB2c4f870365E785982E1f101E93b906;
 
-        shopMap[5] = Shop(5, "Samara", 0x394CAA0Dd589BCe60Ce9d6c20489Be3119a36477, empty);
-        addressShopMap[0x394CAA0Dd589BCe60Ce9d6c20489Be3119a36477] = 5;
-        userMap[0x394CAA0Dd589BCe60Ce9d6c20489Be3119a36477] = User(5, "shop5", "shop5", 0x394CAA0Dd589BCe60Ce9d6c20489Be3119a36477, 6, 0x394CAA0Dd589BCe60Ce9d6c20489Be3119a36477.balance, 6, 5 );
-        userPass[0x394CAA0Dd589BCe60Ce9d6c20489Be3119a36477] = "123";
-        loginMap["shop5"] = 0x394CAA0Dd589BCe60Ce9d6c20489Be3119a36477;
+        shopMap[5] = Shop(5, "Samara", 0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65, empty);
+        addressShopMap[0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65] = 5;
+        userMap[0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65] = User(5, "shop5", "shop5", 0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65, 6, 0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65.balance, 6, 5 );
+        userPass[0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65] = "123";
+        loginMap["shop5"] = 0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65;
 
-        shopMap[6] = Shop(6, "Saint-Petersburg", 0xfFa5165e6BeB49B54c5FdE625168bc46A2D27f3D, empty);
-        addressShopMap[0xfFa5165e6BeB49B54c5FdE625168bc46A2D27f3D] = 6;
-        userMap[0xfFa5165e6BeB49B54c5FdE625168bc46A2D27f3D] = User(6, "shop6", "shop6", 0xfFa5165e6BeB49B54c5FdE625168bc46A2D27f3D, 6, 0xfFa5165e6BeB49B54c5FdE625168bc46A2D27f3D.balance, 6, 6 );
-        userPass[0xfFa5165e6BeB49B54c5FdE625168bc46A2D27f3D] = "123";
-        loginMap["shop6"] = 0xfFa5165e6BeB49B54c5FdE625168bc46A2D27f3D;
+        shopMap[6] = Shop(6, "Saint-Petersburg", 0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc, empty);
+        addressShopMap[0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc] = 6;
+        userMap[0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc] = User(6, "shop6", "shop6", 0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc, 6, 0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc.balance, 6, 6 );
+        userPass[0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc] = "123";
+        loginMap["shop6"] = 0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc;
 
-        shopMap[7] = Shop(7, "Taganrog", 0xFf54975884064A7fF8De55305e00609d46B11128, empty);
-        addressShopMap[0xFf54975884064A7fF8De55305e00609d46B11128] = 7;
-        userMap[0xFf54975884064A7fF8De55305e00609d46B11128] = User(7, "shop7", "shop7", 0xFf54975884064A7fF8De55305e00609d46B11128, 6, 0xFf54975884064A7fF8De55305e00609d46B11128.balance, 6, 7 );
-        userPass[0xFf54975884064A7fF8De55305e00609d46B11128] = "123";
-        loginMap["shop7"] = 0xFf54975884064A7fF8De55305e00609d46B11128;
+        shopMap[7] = Shop(7, "Taganrog", 0x976EA74026E726554dB657fA54763abd0C3a0aa9, empty);
+        addressShopMap[0x976EA74026E726554dB657fA54763abd0C3a0aa9] = 7;
+        userMap[0x976EA74026E726554dB657fA54763abd0C3a0aa9] = User(7, "shop7", "shop7", 0x976EA74026E726554dB657fA54763abd0C3a0aa9, 6, 0x976EA74026E726554dB657fA54763abd0C3a0aa9.balance, 6, 7 );
+        userPass[0x976EA74026E726554dB657fA54763abd0C3a0aa9] = "123";
+        loginMap["shop7"] = 0x976EA74026E726554dB657fA54763abd0C3a0aa9;
 
-        shopMap[8] = Shop(8, "Tomsk", 0x17525B8B19D6b3068b07a5Cb777423b7D491C7F7, empty);
-        addressShopMap[0x17525B8B19D6b3068b07a5Cb777423b7D491C7F7] = 8;
-        userMap[0x17525B8B19D6b3068b07a5Cb777423b7D491C7F7] = User(8, "shop8", "shop8", 0x17525B8B19D6b3068b07a5Cb777423b7D491C7F7, 6, 0x17525B8B19D6b3068b07a5Cb777423b7D491C7F7.balance, 6, 8 );
-        userPass[0x17525B8B19D6b3068b07a5Cb777423b7D491C7F7] = "123";
-        loginMap["shop8"] = 0x17525B8B19D6b3068b07a5Cb777423b7D491C7F7;
+        shopMap[8] = Shop(8, "Tomsk", 0x14dC79964da2C08b23698B3D3cc7Ca32193d9955, empty);
+        addressShopMap[0x14dC79964da2C08b23698B3D3cc7Ca32193d9955] = 8;
+        userMap[0x14dC79964da2C08b23698B3D3cc7Ca32193d9955] = User(8, "shop8", "shop8", 0x14dC79964da2C08b23698B3D3cc7Ca32193d9955, 6, 0x14dC79964da2C08b23698B3D3cc7Ca32193d9955.balance, 6, 8 );
+        userPass[0x14dC79964da2C08b23698B3D3cc7Ca32193d9955] = "123";
+        loginMap["shop8"] = 0x14dC79964da2C08b23698B3D3cc7Ca32193d9955;
 
-        shopMap[9] = Shop(9, "Habarovsk", 0x10837A646FeD756C36f6c47F28649aCEb1Cf6aC4, empty);
-        addressShopMap[0x10837A646FeD756C36f6c47F28649aCEb1Cf6aC4] = 9;
-        userMap[0x10837A646FeD756C36f6c47F28649aCEb1Cf6aC4] = User(9, "shop9", "shop9", 0x10837A646FeD756C36f6c47F28649aCEb1Cf6aC4, 6, 0x10837A646FeD756C36f6c47F28649aCEb1Cf6aC4.balance, 6, 9 );
-        userPass[0x10837A646FeD756C36f6c47F28649aCEb1Cf6aC4] = "123";
-        loginMap["shop9"] = 0x10837A646FeD756C36f6c47F28649aCEb1Cf6aC4;
+        shopMap[9] = Shop(9, "Habarovsk", 0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f, empty);
+        addressShopMap[0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f] = 9;
+        userMap[0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f] = User(9, "shop9", "shop9", 0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f, 6, 0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f.balance, 6, 9 );
+        userPass[0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f] = "123";
+        loginMap["shop9"] = 0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f;
         
-        userMap[0x75F43Cb032f2D932C1c8bD23062A9b41A03Be7C2] = User(10, "bank", "Bank", 0x75F43Cb032f2D932C1c8bD23062A9b41A03Be7C2, 5, 0x75F43Cb032f2D932C1c8bD23062A9b41A03Be7C2.balance, 5, 0);
-        userPass[0x75F43Cb032f2D932C1c8bD23062A9b41A03Be7C2] = "123";
-        loginMap["bank"] = 0x75F43Cb032f2D932C1c8bD23062A9b41A03Be7C2;
-        userMap[0xe7aE610A9ed8E984E92559C162607b8CCFdC73CA] = User(11, "goldfish", "Gold Fish", 0xe7aE610A9ed8E984E92559C162607b8CCFdC73CA, 4, 0xe7aE610A9ed8E984E92559C162607b8CCFdC73CA.balance, 4, 0);
-        userPass[0xe7aE610A9ed8E984E92559C162607b8CCFdC73CA] = "123";
-        loginMap["goldfish"] = 0xe7aE610A9ed8E984E92559C162607b8CCFdC73CA;
-        userMap[0xe61ebaAa099E80E73976293eB9A66E3DABA20322] = User(12, "ivan", "Ivanov Ivan Ivanovich", 0xe61ebaAa099E80E73976293eB9A66E3DABA20322, 3, 0xe61ebaAa099E80E73976293eB9A66E3DABA20322.balance, 3, 0);
-        userPass[0xe61ebaAa099E80E73976293eB9A66E3DABA20322] = "123";
-        loginMap["ivan"] = 0xe61ebaAa099E80E73976293eB9A66E3DABA20322;
-        userMap[0xF1035cf4D5BBB0C81C0C7F4E7291ED35f6bE2A15] = User(13, "semen", "Semenov Semen Semenovich", 0xF1035cf4D5BBB0C81C0C7F4E7291ED35f6bE2A15, 2, 0xF1035cf4D5BBB0C81C0C7F4E7291ED35f6bE2A15.balance, 2, 1);
-        userPass[0xF1035cf4D5BBB0C81C0C7F4E7291ED35f6bE2A15] = "123";
-        loginMap["semen"] = 0xF1035cf4D5BBB0C81C0C7F4E7291ED35f6bE2A15;
-        userMap[0xA4babd4e0ecB7Cb53D7dDA240F7a215CF25f9449] = User(14, "petr", "Petrov Petr Petrovich", 0xA4babd4e0ecB7Cb53D7dDA240F7a215CF25f9449, 1, 0xA4babd4e0ecB7Cb53D7dDA240F7a215CF25f9449.balance, 1, 0);
-        userPass[0xA4babd4e0ecB7Cb53D7dDA240F7a215CF25f9449] = "123";
-        loginMap["petr"] = 0xA4babd4e0ecB7Cb53D7dDA240F7a215CF25f9449;
+        userMap[0xa0Ee7A142d267C1f36714E4a8F75612F20a79720] = User(10, "bank", "Bank", 0xa0Ee7A142d267C1f36714E4a8F75612F20a79720, 5, 0xa0Ee7A142d267C1f36714E4a8F75612F20a79720.balance, 5, 0);
+        userPass[0xa0Ee7A142d267C1f36714E4a8F75612F20a79720] = "123";
+        loginMap["bank"] = 0xa0Ee7A142d267C1f36714E4a8F75612F20a79720;
+        userMap[0xBcd4042DE499D14e55001CcbB24a551F3b954096] = User(11, "goldfish", "Gold Fish", 0xBcd4042DE499D14e55001CcbB24a551F3b954096, 4, 0xBcd4042DE499D14e55001CcbB24a551F3b954096.balance, 4, 0);
+        userPass[0xBcd4042DE499D14e55001CcbB24a551F3b954096] = "123";
+        loginMap["goldfish"] = 0xBcd4042DE499D14e55001CcbB24a551F3b954096;
+        userMap[0x71bE63f3384f5fb98995898A86B02Fb2426c5788] = User(12, "ivan", "Ivanov Ivan Ivanovich", 0x71bE63f3384f5fb98995898A86B02Fb2426c5788, 3, 0x71bE63f3384f5fb98995898A86B02Fb2426c5788.balance, 3, 0);
+        userPass[0x71bE63f3384f5fb98995898A86B02Fb2426c5788] = "123";
+        loginMap["ivan"] = 0x71bE63f3384f5fb98995898A86B02Fb2426c5788;
+
+        userMap[0xFABB0ac9d68B0B445fB7357272Ff202C5651694a] = User(13, "semen", "Semenov Semen Semenovich", 0xFABB0ac9d68B0B445fB7357272Ff202C5651694a, 2, 0xFABB0ac9d68B0B445fB7357272Ff202C5651694a.balance, 2, 1);
+        userPass[0xFABB0ac9d68B0B445fB7357272Ff202C5651694a] = "123";
+        loginMap["semen"] = 0xFABB0ac9d68B0B445fB7357272Ff202C5651694a;
+        userMap[0x1CBd3b2770909D4e10f157cABC84C7264073C9Ec] = User(14, "petr", "Petrov Petr Petrovich", 0x1CBd3b2770909D4e10f157cABC84C7264073C9Ec, 1, 0x1CBd3b2770909D4e10f157cABC84C7264073C9Ec.balance, 1, 0);
+        userPass[0x1CBd3b2770909D4e10f157cABC84C7264073C9Ec] = "123";
+        loginMap["petr"] = 0x1CBd3b2770909D4e10f157cABC84C7264073C9Ec;
         admins.push("ivan");
-        shopMap[1].employees.push(0xF1035cf4D5BBB0C81C0C7F4E7291ED35f6bE2A15);
+        shopMap[1].employees.push(0xFABB0ac9d68B0B445fB7357272Ff202C5651694a);
 
         shops.push(shopMap[1]);
         shops.push(shopMap[2]);
@@ -196,10 +197,11 @@ contract myContract{
     function auth(string memory _login, string memory _password) public view returns(User memory, Coms[] memory, Answer[] memory) {
         require(keccak256(abi.encode(userMap[loginMap[_login]].login)) == keccak256(abi.encode(_login)), "Wrong pair of login and password");
         require(keccak256(abi.encode(userPass[loginMap[_login]])) == keccak256(abi.encode(_password)), "Wrong pair of login and password");
-        return (userMap[loginMap[_login]], userCommMap[userMap[msg.sender].id], userAnswerMap[userMap[msg.sender].id]);
+        return (userMap[loginMap[_login]], userCommMap[userMap[loginMap[_login]].id], userAnswerMap[userMap[loginMap[_login]].id]);
     }
 
     function setAdmin(address _address) public isAdmin {
+        require(userMap[_address].role == 3, "Already exists");
         userMap[_address].role = 3;
         userMap[_address].tempRole = 3;
         admins.push(userMap[_address].login);
@@ -220,9 +222,13 @@ contract myContract{
     function changeRole(address _address, uint256 _role) public isAdmin {
         if(userMap[_address].role == 3){
             userMap[_address].tempRole == _role;
+        }else{
+            if(_role == 3){
+                admins.push(userMap[_address].login);
+            }
+            userMap[_address].role = _role;
+            userMap[_address].tempRole = _role;
         }
-        userMap[_address].role = _role;
-        userMap[_address].tempRole == _role;
     }
 
     function adminToBuyer() public isAdmin{
@@ -247,6 +253,7 @@ contract myContract{
     }
 
     function takeRequest(uint256 _index, bool _solut) public isAdmin{
+        _index--;
         User memory _sender = userMap[requests[_index].userAddress];
         uint256 _shopId = requests[_index].shopId;
         if(_solut){
@@ -255,6 +262,7 @@ contract myContract{
                 userMap[requests[_index].userAddress].tempRole = 2;
                 userMap[requests[_index].userAddress].shopId = _shopId;                
                 shopMap[_shopId].employees.push(_sender.wallet);
+                shops[_shopId-1].employees.push(_sender.wallet);
             }
             else{
                 userMap[requests[_index].userAddress].role = 1;
@@ -263,6 +271,11 @@ contract myContract{
                 for(uint256 i = 0; i < shopMap[requests[_index].shopId].employees.length; i++){
                     if(shopMap[_shopId].employees[i] == _sender.wallet){
                         delete shopMap[_shopId].employees[i];
+                    }
+                }
+                for(uint256 i = 0; i<shops[_shopId-1].employees.length; i++){
+                    if(_sender.wallet == shops[_shopId-1].employees[i]){
+                        delete shops[_shopId-1].employees[i];
                     }
                 }
             }
