@@ -5,9 +5,7 @@ pragma solidity ^0.8.0;
 contract myContract{
 
     address private owner = msg.sender;
-    uint256 private shopId = 9;
     uint256 private userId = 15;
-    uint256 private requestId = 0;
     struct User{
         uint256 id;
         string login;
@@ -55,7 +53,6 @@ contract myContract{
     Shop[] shops;
 
     mapping(address => User) public userMap;
-    mapping(uint256 => address) private idUserMap;
     mapping(address => string) private userPass;
     mapping(string => address) private loginMap;
     mapping(uint256 => Shop) private shopMap;
@@ -190,7 +187,6 @@ contract myContract{
         require(loginMap[_login] == address(0), "User already created" );
         userMap[msg.sender] = User(userId++,_login,_name,msg.sender, 1, address(msg.sender).balance, 1, 0);
         userPass[msg.sender] = _password;
-        idUserMap[userId] = msg.sender;
         loginMap[_login] = msg.sender;
     }
 
@@ -248,8 +244,8 @@ contract myContract{
     }
 
     function sendRequest(uint256 _shopId) public isSellerOrBuyer{
-        requestId++;
-        requests.push(Request(requestId, _shopId, msg.sender));
+        uint256 id = requests.length;
+        requests.push(Request(id, _shopId, msg.sender));
     }
 
     function takeRequest(uint256 _index, bool _solut) public isAdmin{
@@ -288,13 +284,14 @@ contract myContract{
     }
 
     function addShop(address _shopAddress, string memory _city) public isAdmin {
-        shopId++;
+        uint256 id = shops.length;
         address[] memory empty;
-        shopMap[shopId] = Shop(shopId, _city, _shopAddress, empty);
+        shopMap[id] = Shop(id, _city, _shopAddress, empty);
+        addressShopMap[_shopAddress] = id;
         userMap[_shopAddress].role = 6;
         userMap[_shopAddress].tempRole = 6;
-        userMap[_shopAddress].shopId = shopId;
-        shops.push(shopMap[shopId]); 
+        userMap[_shopAddress].shopId = id;
+        shops.push(shopMap[id]); 
     }
 
     function deleteShop(uint256 _shopId) public isAdmin {
@@ -311,14 +308,14 @@ contract myContract{
 
     function addComm(string memory _text, uint256 _shopId, uint256 _point) public isBuyer {
         require(_point <= 10 && _point >= 1, "Point must be in range 1-10");
-        uint256 _id = shopCommMap[_shopId].length;
+        uint256 _id = shopCommMap[_shopId].length+1;
         shopCommMap[_shopId].push(Coms(_id,userMap[msg.sender].id, _text, 0, 0, _point));
         userCommMap[userMap[msg.sender].id].push(Coms(_id,userMap[msg.sender].id, _text, 0, 0, _point));
     }
 
     function addAnswer(uint256 _parent, uint256 _shopId, string memory _text) public {
         require((userMap[msg.sender].shopId == _shopId ) || (userMap[msg.sender].role == 1), "You are not buyer or seller of this shop");
-        uint256 _id = answerComsMap[_parent].length;
+        uint256 _id = answerComsMap[_parent].length+1;
         answerComsMap[_parent].push(Answer(_id,userMap[msg.sender].id, _text, 0, 0));
         userAnswerMap[userMap[msg.sender].id].push(Answer(_id,userMap[msg.sender].id, _text, 0, 0));
     }
@@ -332,18 +329,22 @@ contract myContract{
     }
 
     function likeComm(uint256 _shopId, uint256 _commId) public isNotGuest {
+        _commId--;
         shopCommMap[_shopId][_commId].likes++;
     }
 
     function dislikeComm(uint256 _shopId, uint256 _commId) public isNotGuest {
+        _commId--;
         shopCommMap[_shopId][_commId].dislikes++;
     }
 
     function likeAnswer(uint256 _parent, uint256 _answerId) isNotGuest public {
+        _answerId--;
         answerComsMap[_parent][_answerId].likes++;
     }
 
     function dislikeAnswer(uint256 _parent, uint256 _answerId) isNotGuest public {
+        _answerId--;
         answerComsMap[_parent][_answerId].dislikes++;
     }
 
