@@ -244,63 +244,72 @@ let shops = [{
     "city": "Dmitrov",
     "employees": ["semen"],
     "login": "shop1",
-    "rate": 0
+    "rate": 0,
+    "products": [{}]
 },
 {
     "id": 2,
     "city": "Kaluga",
     "employees": [],
     "login": "shop2",
-    "rate": 0
+    "rate": 0,
+    "products": [{}]
 },
 {
     "id": 3,
     "city": "Moscow",
     "employees": ["ugin"],
     "login": "shop3",
-    "rate": 0
+    "rate": 0,
+    "products": [{}]
 },
 {
     "id": 4,
     "city": "Ryazan",
     "employees": [],
     "login": "shop4",
-    "rate": 0
+    "rate": 0,
+    "products": [{}]
 },
 {
     "id": 5,
     "city": "Samara",
     "employees": ["dima"],
     "login": "shop5",
-    "rate": 0
+    "rate": 0,
+    "products": [{}]
 },
 {
     "id": 6,
     "city": "Saint-Petersburg",
     "employees": [],
     "login": "shop6",
-    "rate": 0
+    "rate": 0,
+    "products": [{}]
 },
 {
     "id": 7,
     "city": "Taganrog",
     "employees": ["vasya"],
     "login": "shop7",
-    "rate": 0
+    "rate": 0,
+    "products": [{}]
 },
 {
     "id": 8,
     "city": "Tomsk",
     "employees": ["igor"],
     "login": "shop8",
-    "rate": 0
+    "rate": 0,
+    "products": [{}]
 },
 {
     "id": 9,
     "city": "Habarovsk",
     "employees": [],
     "login": "shop9",
-    "rate": 0
+    "rate": 0,
+    "products": [{}]
 }
 ];
 
@@ -440,6 +449,15 @@ let deliveryRequests = [
 }
 ];
 
+function transfer(from, to, value){
+    let result = false;
+    if(users[from].balance >= value){
+        users[from].balance -= value;
+        users[to].balance += value;
+        result = true;
+    }
+    return result;
+}
 
 app.get("/", (req, res) => {
     res.status(200).json({ message: "Hello Express" })
@@ -766,7 +784,7 @@ function checkTemperatureOut(index){
     if(discountCounter !== 0){
         deliveryRequests[index].price -= deliveryRequests[index].price * (discountCounter*0.1);
     }
-    
+    return discountCounter;
 }
 
 app.post('/requestDelivery', (req, res) => {
@@ -793,14 +811,25 @@ app.get('/getDelivery', (req, res) => {
 app.post('/acceptPrice', (req, res) => {
     const {solution, shopId} = req.body;
     const index = deliveryRequests.findIndex((el) => el.shopId == shopId);
+    const shopIndex = shops.findIndex((el) => el.id == shopId);
+    const user = users.findIndex((el) => el.login == shops[shopIndex].login);
+    const vendor = users.findIndex((el) => el.login == "goldfish");
+    const productIndex = products.findIndex((el) => el.title == deliveryRequests[index].title)
     if(index == -1){
         return res.status(500).json({error: "Request not found"})
     }
     if(solution){
     deliveryRequests[index].status = solution;
     getDeliveryTemperature(index);
-    checkTemperatureOut(index);
-    return res.status(200).json({message: "Price accepted" })
+    let counter = checkTemperatureOut(index);
+    if(counter == 0){
+        if(transfer(user,vendor, deliveryRequests[index].price)){
+            shops[shopIndex].products.push({...products[productIndex], "count": deliveryRequests[index].count});
+            return res.status(200).json({message: "Price accepted" })
+        }else{
+            return res.status(500).json({error: "Not enough money"})
+        }
+    }
     }else{
         deliveryRequests.splice(index, 1);
         return res.status(200).json({message: "Delivery canceled"});
@@ -810,7 +839,9 @@ app.post('/acceptPrice', (req, res) => {
 app.post('/acceptDelivery', (req, res) => {
     const {solution, shopId} = req.body;
     const delivery = deliveryRequests.find((el) => el.shopId == shopId);
+    if(solution){
 
+    }
 })
 
 app.listen(3000, () => console.log("Server started on port 3000"))
