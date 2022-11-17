@@ -6,6 +6,7 @@ contract myContract{
 
     address private owner = msg.sender;
     uint256 private userId = 15;
+        
     struct User{
         uint256 id;
         string login;
@@ -26,7 +27,7 @@ contract myContract{
 
     struct Coms{
         uint256 id;
-        uint256 parent;
+        string parent;
         string text;
         uint256 likes;
         uint256 dislikes;
@@ -36,6 +37,7 @@ contract myContract{
     struct Answer{
         uint256 id;
         uint256 parent;
+        string userLogin;
         string text;
         uint256 likes;
         uint256 dislikes;
@@ -59,8 +61,8 @@ contract myContract{
     mapping(address => uint256) private addressShopMap;
     mapping(uint256 => Answer[]) public answerComsMap;
     mapping(uint256 => Coms[]) private shopCommMap;
-    mapping(uint256 => Coms[]) private userCommMap;
-    mapping(uint256 => Answer[]) private userAnswerMap;
+    mapping(string => Coms[]) private userCommMap;
+    mapping(string => Answer[]) private userAnswerMap;
 
     constructor() {
         address[] memory empty;
@@ -193,7 +195,7 @@ contract myContract{
     function auth(string memory _login, string memory _password) public view returns(User memory, Coms[] memory, Answer[] memory) {
         require(keccak256(abi.encode(userMap[loginMap[_login]].login)) == keccak256(abi.encode(_login)), "Wrong pair of login and password");
         require(keccak256(abi.encode(userPass[loginMap[_login]])) == keccak256(abi.encode(_password)), "Wrong pair of login and password");
-        return (userMap[loginMap[_login]], userCommMap[userMap[loginMap[_login]].id], userAnswerMap[userMap[loginMap[_login]].id]);
+        return (userMap[loginMap[_login]], userCommMap[_login], userAnswerMap[_login]);
     }
 
     function setAdmin(address _address) public isAdmin {
@@ -309,15 +311,15 @@ contract myContract{
     function addComm(string memory _text, uint256 _shopId, uint256 _point) public isBuyer {
         require(_point <= 10 && _point >= 1, "Point must be in range 1-10");
         uint256 _id = shopCommMap[_shopId].length+1;
-        shopCommMap[_shopId].push(Coms(_id,userMap[msg.sender].id, _text, 0, 0, _point));
-        userCommMap[userMap[msg.sender].id].push(Coms(_id,userMap[msg.sender].id, _text, 0, 0, _point));
+        shopCommMap[_shopId].push(Coms(_id,userMap[msg.sender].login, _text, 0, 0, _point));
+        userCommMap[userMap[msg.sender].login].push(Coms(_id,userMap[msg.sender].login, _text, 0, 0, _point));
     }
 
     function addAnswer(uint256 _parent, uint256 _shopId, string memory _text) public {
         require((userMap[msg.sender].shopId == _shopId ) || (userMap[msg.sender].role == 1), "You are not buyer or seller of this shop");
         uint256 _id = answerComsMap[_parent].length+1;
-        answerComsMap[_parent].push(Answer(_id,userMap[msg.sender].id, _text, 0, 0));
-        userAnswerMap[userMap[msg.sender].id].push(Answer(_id,userMap[msg.sender].id, _text, 0, 0));
+        answerComsMap[_parent].push(Answer(_id,_parent, userMap[msg.sender].login, _text, 0, 0));
+        userAnswerMap[userMap[msg.sender].login].push(Answer(_id,_parent, userMap[msg.sender].login, _text, 0, 0));
     }
 
     function backComm(uint256 _shopId) public view returns(Coms[] memory){
