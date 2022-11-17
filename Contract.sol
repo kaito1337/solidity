@@ -351,7 +351,10 @@ contract myContract{
     }
 
     function requestLoan() public isShop {
-       loans.push(addressShopMap[msg.sender]);
+        for(uint256 i = 0; i<loans.length; i++){
+            require(loans[i] != addressShopMap[msg.sender], "You are already send request");
+        }
+        loans.push(addressShopMap[msg.sender]);
     }
 
     function returnLoans() public view isBank returns(uint256[] memory){
