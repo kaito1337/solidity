@@ -340,12 +340,12 @@ contract myContract{
         shopCommMap[_shopId][_commId].dislikes++;
     }
 
-    function likeAnswer(uint256 _parent, uint256 _answerId) isNotGuest public {
+    function likeAnswer(uint256 _parent, uint256 _answerId) public isNotGuest {
         _answerId--;
         answerComsMap[_parent][_answerId].likes++;
     }
 
-    function dislikeAnswer(uint256 _parent, uint256 _answerId) isNotGuest public {
+    function dislikeAnswer(uint256 _parent, uint256 _answerId) public isNotGuest {
         _answerId--;
         answerComsMap[_parent][_answerId].dislikes++;
     }
