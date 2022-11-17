@@ -50,7 +50,7 @@ contract myContract{
     }
 
     Request[] requests;
-    uint256[] dolgi;
+    uint256[] loans;
     string[] admins;
     Shop[] shops;
 
@@ -322,7 +322,7 @@ contract myContract{
         userAnswerMap[userMap[msg.sender].login].push(Answer(_id,_parent, userMap[msg.sender].login, _text, 0, 0));
     }
 
-    function backComm(uint256 _shopId) public view returns(Coms[] memory){
+    function backComms(uint256 _shopId) public view returns(Coms[] memory){
         return shopCommMap[_shopId];
     }
 
@@ -350,21 +350,21 @@ contract myContract{
         answerComsMap[_parent][_answerId].dislikes++;
     }
 
-    function requestDolg() public isShop {
-       dolgi.push(addressShopMap[msg.sender]);
+    function requestLoan() public isShop {
+       loans.push(addressShopMap[msg.sender]);
     }
 
-    function giveDolg(uint256 _index, bool _solut) public payable isBank(){
+    function giveLoan(uint256 _index, bool _solut) public payable isBank(){
         if(_solut){
         require(msg.value == 1000 ether, "Invalid value");
         _index++;
-        payable(shopMap[dolgi[_index]].wallet).transfer(msg.value);
+        payable(shopMap[loans[_index]].wallet).transfer(msg.value);
         userMap[msg.sender].balance -= 1000 ether;
-        userMap[shopMap[dolgi[_index]].wallet].balance += 1000 ether;
-        delete dolgi[_index];
+        userMap[shopMap[loans[_index]].wallet].balance += 1000 ether;
+        delete loans[_index];
         } else {
             require(msg.value == 0, "Invalid value");
-            delete dolgi[_index];
+            delete loans[_index];
         }
     }
 }
