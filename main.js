@@ -13,7 +13,7 @@ let users = [
     "name": "shop1",
     "pass": "123",
     "role": 6,
-    "balance": 0,
+    "balance": 50,
     "tempRole": 6, 
     "shopId": 1,
 },
@@ -245,7 +245,9 @@ let shops = [{
     "employees": ["semen"],
     "login": "shop1",
     "rate": 0,
-    "products": [{}]
+    "products": [{}],
+    "orders": [{}],
+    "returns": [{}]
 },
 {
     "id": 2,
@@ -253,7 +255,9 @@ let shops = [{
     "employees": [],
     "login": "shop2",
     "rate": 0,
-    "products": [{}]
+    "products": [{}],
+    "orders": [{}],
+    "returns": [{}]
 },
 {
     "id": 3,
@@ -261,7 +265,9 @@ let shops = [{
     "employees": ["ugin"],
     "login": "shop3",
     "rate": 0,
-    "products": [{}]
+    "products": [{}],
+    "orders": [{}],
+    "returns": [{}]
 },
 {
     "id": 4,
@@ -269,7 +275,9 @@ let shops = [{
     "employees": [],
     "login": "shop4",
     "rate": 0,
-    "products": [{}]
+    "products": [{}],
+    "orders": [{}],
+    "returns": [{}]
 },
 {
     "id": 5,
@@ -277,7 +285,9 @@ let shops = [{
     "employees": ["dima"],
     "login": "shop5",
     "rate": 0,
-    "products": [{}]
+    "products": [{}],
+    "orders": [{}],
+    "returns": [{}]
 },
 {
     "id": 6,
@@ -285,7 +295,9 @@ let shops = [{
     "employees": [],
     "login": "shop6",
     "rate": 0,
-    "products": [{}]
+    "products": [{}],
+    "orders": [{}],
+    "returns": [{}]
 },
 {
     "id": 7,
@@ -293,7 +305,9 @@ let shops = [{
     "employees": ["vasya"],
     "login": "shop7",
     "rate": 0,
-    "products": [{}]
+    "products": [{}],
+    "orders": [{}],
+    "returns": [{}]
 },
 {
     "id": 8,
@@ -301,7 +315,9 @@ let shops = [{
     "employees": ["igor"],
     "login": "shop8",
     "rate": 0,
-    "products": [{}]
+    "products": [{}],
+    "orders": [{}],
+    "returns": [{}]
 },
 {
     "id": 9,
@@ -309,7 +325,9 @@ let shops = [{
     "employees": [],
     "login": "shop9",
     "rate": 0,
-    "products": [{}]
+    "products": [{}],
+    "orders": [{}],
+    "returns": [{}]
 }
 ];
 
@@ -768,14 +786,14 @@ app.post('/getRate', (req, res) => {
 function getDeliveryTemperature(index){
     const product = products.find((el) => el.title == deliveryRequests[index].title);
     for(let i = 0; i < 5; i++){
-        let temperature = Math.random(product.minTemperature, product.maxTemperature);
+        let temperature = Math.floor(Math.random() * (product.maxTemperature - product.minTemperature + 1) + product.minTemperature)
         deliveryRequests[index].deliveryTemperature.push(temperature);
     }
 }
 
 function checkTemperatureOut(index){
     const product = products.find((el) => el.title == deliveryRequests[index].title);
-    const discountCounter = 0;
+    let discountCounter = 0;
     for (let i of deliveryRequests[index].deliveryTemperature){
         if(i < product.minTemperature || i > product.maxTemperature){
             discountCounter++;
@@ -791,7 +809,6 @@ app.post('/requestDelivery', (req, res) => {
     const {shopId, title, count} = req.body;
     const product = products.find((el) => el.title == title);
     const shop = shops.find((el) => el.id == shopId);
-    console.log(shop)
     if(shop){
         if(product){
             let cof = count <= 100 ? 1 : count <= 1000 ? 0.95 : 0.9
@@ -808,40 +825,128 @@ app.get('/getDelivery', (req, res) => {
     return res.status(200).json({deliveryRequests});
 })
 
+
 app.post('/acceptPrice', (req, res) => {
     const {solution, shopId} = req.body;
     const index = deliveryRequests.findIndex((el) => el.shopId == shopId);
-    const shopIndex = shops.findIndex((el) => el.id == shopId);
-    const user = users.findIndex((el) => el.login == shops[shopIndex].login);
-    const vendor = users.findIndex((el) => el.login == "goldfish");
-    const productIndex = products.findIndex((el) => el.title == deliveryRequests[index].title)
     if(index == -1){
         return res.status(500).json({error: "Request not found"})
     }
     if(solution){
-    deliveryRequests[index].status = solution;
+        deliveryRequests[index].status = solution;
+        return res.status(500).json({message: "Price accepted"});
+    }else{
+        deliveryRequests.splice(index, 1);
+        return res.status(500).json({message: "Price canceled" });
+    }
+});
+
+app.post('/acceptDelivery', (req, res) => {
+    const {solution, shopId} = req.body;
+    const index = deliveryRequests.findIndex((el) => el.shopId == shopId);
+    if(index == -1){
+        return res.status(500).json({error: "Request not found"})
+    }
+    const shopIndex = shops.findIndex((el) => el.id == shopId);
+    const user = users.findIndex((el) => el.login == shops[shopIndex].login);
+    const vendor = users.findIndex((el) => el.login == "goldfish");
+    const productIndex = products.findIndex((el) => el.title == deliveryRequests[index].title)
     getDeliveryTemperature(index);
     let counter = checkTemperatureOut(index);
-    if(counter == 0){
-        if(transfer(user,vendor, deliveryRequests[index].price)){
-            shops[shopIndex].products.push({...products[productIndex], "count": deliveryRequests[index].count});
-            return res.status(200).json({message: "Price accepted" })
-        }else{
-            return res.status(500).json({error: "Not enough money"})
+    if(solution){
+        if(counter == 0){
+            if(transfer(user,vendor, deliveryRequests[index].price)){
+                shops[shopIndex].products.push({...products[productIndex], "price":products[productIndex].price += products[productIndex].price * 0.5,  "count": deliveryRequests[index].count});
+                deliveryRequests.splice(index,1);
+                return res.status(200).json({message: "Delivery accepted" })
+            }else{
+                return res.status(500).json({error: "Not enough money"})
+            }
+        }else if(transfer(user,vendor, deliveryRequests[index].price)){
+            shops[shopIndex].products.push({...products[productIndex], "price":products[productIndex].price += products[productIndex].price * 0.5,  "count": deliveryRequests[index].count});
+            deliveryRequests.splice(index,1);
         }
-    }
     }else{
         deliveryRequests.splice(index, 1);
         return res.status(200).json({message: "Delivery canceled"});
     }
 })
 
-app.post('/acceptDelivery', (req, res) => {
-    const {solution, shopId} = req.body;
-    const delivery = deliveryRequests.find((el) => el.shopId == shopId);
-    if(solution){
 
+app.post('/orderProduct', (req,res) => {
+    const {login, shopId, title, count} = req.body;
+    const index = products.findIndex((el) => el.title == title);
+    const shopIndex = shops.findIndex((el) => el.id == shopId);
+    const productPrice = products[index].price;
+    if(index == -1 || shopIndex == -1){
+        return res.status(500).json({error: "Product or shop not found"});
+    }
+    const id = shops[shopIndex].orders.length+1;
+    shops[shopIndex].orders.push({id, "customer": login, "product": title, count, "price": count*productPrice, "status": false})
+    return res.status(200).json({message: "Order created"});
+})
+
+app.post('/acceptOrder', (req,res) => {
+    const {solution, orderId, shopId} = req.body;
+    const shopIndex = shops.findIndex((el) => el.id == shopId);
+    const orderIndex = shops[shopIndex].orders.findIndex((el) => el.id == orderId);
+    const userIndex = users.findIndex((el) => el.login == shops[shopIndex].orders[orderIndex].customer);
+    const indexShopUser = users.findIndex((el) => el.login == shops[shopIndex].login);
+    const price = shops[shopIndex].orders[orderIndex].price
+    if(shopIndex == -1 || orderIndex == -1){
+        return res.status(500).json({error: "Order or shop not found"});
+    }
+    if(solution && transfer(userIndex, indexShopUser, price)){
+        shops[shopIndex].orders[orderIndex].status = true;
+        return res.status(200).json({message: "Success sell"});
     }
 })
 
+app.post('/cancelOrder', (req,res) => {
+    const {orderId, login, shopId} = req.body;
+    const shopIndex = shops.findIndex((el) => el.id == shopId);
+    const orderIndex = shops[shopIndex].orders.findIndex((el) => el.id == orderId);
+    if(shopIndex == -1 || orderIndex == -1 || shops[shopIndex].orders[orderIndex].customer != login ){
+        return res.status(500).json({error: "Order or shop not found or you are not customer"});
+    }
+    if(shops[shopIndex].orders[orderIndex].status == false){
+    shops[shopIndex].orders.splice(orderIndex, 1);
+    return res.status(200).json({message: "Success cancel order"});
+    }else{
+        return res.status(500).json({error: "Order has been approved by seller"});
+    }
+})
+
+app.post('/returnProduct', (req,res) => {
+    const {orderId, shopId, login} = req.body;
+    const shopIndex = shops.findIndex((el) => el.id == shopId);
+    const orderIndex = shops[shopIndex].orders.findIndex((el) => el.id == orderId);
+    if(shopIndex == -1 || orderIndex == -1 || shops[shopIndex].orders[orderIndex].customer != login ){
+        return res.status(500).json({error: "Order or shop not found or you are not customer"});
+    }
+    const id = shops[shopIndex].returns.length+1;
+    shops[shopIndex].returns.push({id, orderId, "status": false});
+    return res.status(200).json({message: "Success created a request"});
+})
+
+app.post('/checkReturn', (req, res) => {
+    const {solution, shopId, returnId} = req.body;
+    const shopIndex = shops.findIndex((el) => el.id == shopId);
+    const returnIndex = shops[shopIndex].returns.findIndex((el) => el.id == returnId);
+    if(shopIndex == -1 || returnIndex == -1){
+        return res.status(500).json({error: "Return or shop not found"});
+    }
+    const order = shops[shopIndex].orders.find((el) => el.id == shops[shopIndex].returns[returnId].orderId);
+    const userIndex = users.findIndex((el) => el.login == order.customer);
+    const productIndex = shops[shopIndex].products.findIndex((el) => el.title == order.product);
+    const indexShopUser = users.findIndex((el) => el.login == shops[shopIndex].login);
+    const price = order.price;
+    if(solution && transfer(users[indexShopUser], users[userIndex], price)){
+        shops[shopIndex].products[productIndex].count += order.count;
+        shops[shopIndex].returns[returnIndex].status = solution;
+        return res.status(200).json({message: "Order return approved"});
+    }
+    shops[shopIndex].returns[returnIndex].status = false;
+    return res.status(200).json({message: "Order has been rejected"});
+})
 app.listen(3000, () => console.log("Server started on port 3000"))
