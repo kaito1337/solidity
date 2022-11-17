@@ -57,7 +57,7 @@ contract myContract{
     mapping(address => User) public userMap;
     mapping(address => string) private userPass;
     mapping(string => address) private loginMap;
-    mapping(uint256 => Shop) private shopMap;
+    mapping(uint256 => Shop) public shopMap;
     mapping(address => uint256) private addressShopMap;
     mapping(uint256 => Answer[]) public answerComsMap;
     mapping(uint256 => Coms[]) private shopCommMap;
@@ -213,6 +213,10 @@ contract myContract{
         return shops;
     }
 
+    function emplreturn(uint256 _id) external view returns (address[] memory){
+        return shopMap[_id].employees;
+    }
+
     function changeRole(address _address, uint256 _role) public isAdmin {
         if(userMap[_address].role == 3){
             userMap[_address].tempRole == _role;
@@ -336,12 +340,12 @@ contract myContract{
         shopCommMap[_shopId][_commId].dislikes++;
     }
 
-    function likeAnswer(uint256 _parent, uint256 _answerId) public isNotGuest {
+    function likeAnswer(uint256 _parent, uint256 _answerId)  public isNotGuest {
         _answerId--;
         answerComsMap[_parent][_answerId].likes++;
     }
 
-    function dislikeAnswer(uint256 _parent, uint256 _answerId) public isNotGuest {
+    function dislikeAnswer(uint256 _parent, uint256 _answerId) public isNotGuest{
         _answerId--;
         answerComsMap[_parent][_answerId].dislikes++;
     }
@@ -350,17 +354,20 @@ contract myContract{
        loans.push(addressShopMap[msg.sender]);
     }
 
+    function returnLoans() public view isBank returns(uint256[] memory){
+        return loans;
+    }
+
     function giveLoan(uint256 _index, bool _solut) public payable isBank(){
         if(_solut){
         require(msg.value == 1000 ether, "Invalid value");
-        _index++;
+        _index--;
         payable(shopMap[loans[_index]].wallet).transfer(msg.value);
         userMap[msg.sender].balance -= 1000 ether;
         userMap[shopMap[loans[_index]].wallet].balance += 1000 ether;
-        delete loans[_index];
         } else {
             require(msg.value == 0, "Invalid value");
-            delete loans[_index];
         }
+        delete loans[_index];
     }
 }
