@@ -213,10 +213,6 @@ contract myContract{
         return shops;
     }
 
-    function emplreturn(uint256 _id) external view returns (address[] memory){
-        return shopMap[_id].employees;
-    }
-
     function changeRole(address _address, uint256 _role) public isAdmin {
         if(userMap[_address].role == 3){
             userMap[_address].tempRole == _role;
