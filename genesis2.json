@@ -1,0 +1,64 @@
+{
+    "config":{
+        "eip150Block": 0,
+        "eip155Block": 0,
+        "eip158Block": 0,
+        "istanbulBlock": 0,
+        "petersburgBlock": 0,
+        "homesteadBlock": 0,
+        "byzantiumBlock": 0,
+        "constantinopleBlock": 0,
+        "chainId": 13
+    },
+    "alloc":{
+        "0x1e924f60547578e15d76ead98e18d65f771c8b99": {
+            "balance": "1000000000000000000000"
+        },
+        "0xaf19af45c8605def25856cdf7e63521167d2015c":{
+            "balance": "900000000000000000000"
+        },
+        "0xd00159f56eb0cbc8524a39c0f6d9a954274da3d8":{
+            "balance": "1050000000000000000000"
+        },
+        "0x7e9b16c5c0dc654186a56a8c23ee197bc5b20bb7":{
+            "balance": "700000000000000000000"
+        },
+        "0xeabff4833f926f77316730ca0a0828a1f6894401":{
+            "balance": "2000000000000000000000"
+        },
+        "0xc68d32f2d96100e9e22a56bad053a40cad7f4615":{
+            "balance": "2300000000000000000000"
+        },
+        "0x70133c4d41f0e59881bedacd534e44b0821d7d26":{
+            "balance": "000000000000000000"
+        },
+        "0xeaacbe3f7f2a23113c388185a1fbd2ceac57f922":{
+            "balance": "780000000000000000000"
+        },
+        "0x2ffa496311d11e1424caf4edd0a88800b369204f":{
+            "balance": "1500000000000000000000"
+        },
+        "0x3b49b86f2077353faae070f077eae60d620a092f":{
+            "balance": "10000000000000000000000"
+        },
+        "0x7858c196a8b6e4c96b693c79e834acbf0fd2e7b9":{
+            "balance": "100000000000000000000"
+        },
+        "0x3380c2e6d0249afbc94da02e6049e25f8a1aa126":{
+            "balance": "50000000000000000000"
+        },
+        "0x73e4f7bde3dd0c272ed2e109d9a6daf02d36c145":{
+            "balance": "70000000000000000000"
+        },
+        "0x5f2dd1675c61ea0060e41b4bb3b248df26af85e9":{
+            "balance": "80000000000000000000"
+        },
+        "0xd57c5942b538134a99e623ccc66c307cb734e390":{
+            "balance": "000000000000000000"
+        }
+    },
+    "nonce": "0x200",
+    "gasValue": "0x100",
+    "gasLimit": "0x300000000",
+    "difficulty": "0x0"
+}
