@@ -195,9 +195,9 @@ contract myContract{
         return admins;
     }
 
-    function sendTransfer(address _receiver, uint256 _total, uint256 _lifetime) public {
-        moneyTransferMap[moneyTransferId++] = moneyTransfer(moneyTransferId, msg.sender, _receiver, _total * (10**18), (_lifetime * 5 seconds + block.timestamp), false);
-        userMap[msg.sender].balance -= _total * (10**18);
+    function sendTransfer(address _receiver, uint256 _lifetime) public payable {
+        moneyTransferMap[moneyTransferId++] = moneyTransfer(moneyTransferId, msg.sender, _receiver, msg.value, (_lifetime * 5 seconds + block.timestamp), false);
+        userMap[msg.sender].balance -= msg.value;
     }
 
     function acceptTransfer(uint256 _id) public {
@@ -205,12 +205,14 @@ contract myContract{
         require(!moneyTransferMap[_id].status, "User already taked transfer");
         require(moneyTransferMap[_id].lifetime > block.timestamp, "Time is out");
         userMap[msg.sender].balance += moneyTransferMap[_id].total;
+        payable(msg.sender).transfer(moneyTransferMap[_id].total);
     }
 
     function cancelTransfer(uint256 _id) public {
         require(moneyTransferMap[_id].sender == msg.sender || moneyTransferMap[_id].receiver == msg.sender);
         require(!moneyTransferMap[_id].status, "User already taked transfer");
         userMap[msg.sender].balance += moneyTransferMap[_id].total;
+        payable(msg.sender).transfer(moneyTransferMap[_id].total);
         delete moneyTransferMap[_id];
     }
 
