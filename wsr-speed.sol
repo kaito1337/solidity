@@ -197,22 +197,22 @@ contract myContract{
 
     function sendTransfer(address _receiver, uint256 _lifetime) public payable {
         moneyTransferMap[moneyTransferId++] = moneyTransfer(moneyTransferId, msg.sender, _receiver, msg.value, (_lifetime * 5 seconds + block.timestamp), false);
-        userMap[msg.sender].balance -= msg.value;
+        userMap[msg.sender].balance = msg.sender.balance;
     }
 
-    function acceptTransfer(uint256 _id) public {
+    function acceptTransfer(uint256 _id, uint256 _value) public {
         require(moneyTransferMap[_id].receiver == msg.sender, "You are not receiver");
         require(!moneyTransferMap[_id].status, "User already taked transfer");
         require(moneyTransferMap[_id].lifetime > block.timestamp, "Time is out");
-        userMap[msg.sender].balance += moneyTransferMap[_id].total;
-        payable(msg.sender).transfer(moneyTransferMap[_id].total);
+        payable(msg.sender).transfer(_value*10**18);
+        userMap[msg.sender].balance = msg.sender.balance;
     }
 
     function cancelTransfer(uint256 _id) public {
         require(moneyTransferMap[_id].sender == msg.sender || moneyTransferMap[_id].receiver == msg.sender);
         require(!moneyTransferMap[_id].status, "User already taked transfer");
-        userMap[msg.sender].balance += moneyTransferMap[_id].total;
         payable(msg.sender).transfer(moneyTransferMap[_id].total);
+        userMap[msg.sender].balance = msg.sender.balance;
         delete moneyTransferMap[_id];
     }
 
@@ -255,7 +255,7 @@ contract myContract{
         }
     }
 
-    function getTotal(uint256 _idTotal, uint256 _idxMail, uint256 _idMail, uint256 _shipPrice) public {
+    function getTotal(uint256 _idTotal, uint256 _idxMail, uint256 _idMail, uint256 _shipPrice) private {
         Ship memory _ship = shipMap[_idTotal];
         shipMap[_idTotal].totalPrice = _shipPrice * _ship.weight + (_ship.cennost / 10);
         mailShipMap[_idxMail][_idMail-1].totalPrice = _shipPrice * _ship.weight + (_ship.cennost / 10);
