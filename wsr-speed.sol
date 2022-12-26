@@ -20,7 +20,7 @@ contract myContract{
         address sender;
         address receiver;
         string typ;
-        uint256 clas;
+        uint256 receiveMail;
         uint256 shipTime;
         uint256 weight;
         uint256 cennost;
@@ -28,6 +28,13 @@ contract myContract{
         string senderAdres;
         string receiveAdres;
         uint256 date;
+    }
+
+    struct Info{
+        uint256 id;
+        uint256 weight;
+        uint256 mail;
+        string login;
     }
 
     struct Mail{
@@ -53,8 +60,10 @@ contract myContract{
     mapping(address => string) public passwordMap;
     mapping(address => User) public userMap;
     mapping(uint256 => Ship) public shipMap;
+    mapping(uint256 => Info) public infoMap;
     mapping(uint256 => bool) public statusShipMap;
     mapping(uint256 => Ship[]) public mailShipMap;
+    mapping(uint256 => uint256) public classShipMap;
     mapping(uint256 => moneyTransfer) public moneyTransferMap;
 
     constructor(){
@@ -140,10 +149,10 @@ contract myContract{
         userMap[msg.sender].takeShip = false;
     }
 
-    function addShip(uint256 _mail, address _receiver, string memory _typ, uint256 _clas, uint256 _weight, string memory _senderAdres, string memory _receiveAdres) public{
+    function addShip(uint256 _mail, uint256 _receiveMail, address _receiver, string memory _typ, uint256 _clas, uint256 _weight, string memory _receiveAdres) public{
+        require(userMap[_receiver].takeShip, "User not accepting ships or not registered");
         require(_weight <= 10, "Weight is much");
         require(_clas <= 3 && _clas >= 0, "Invalid class");
-        // require(userMap[_receiver].takeShip, "User not accepting ships or not registered");
         uint256 counter = 0;
         for(uint256 i = 0; i < indexes.length; i++){
             if(indexes[i] == _mail){
@@ -163,9 +172,11 @@ contract myContract{
                     shipPrice = _weight / 10;
                 }
                 counter++;
-                shipMap[id] = Ship(id, _mail, "", msg.sender, _receiver, _typ, _clas, shipTime, _weight, 0, 0, _senderAdres, _receiveAdres, block.timestamp);
-                mailShipMap[_mail].push(Ship(id2, _mail, "", msg.sender, _receiver, _typ, _clas, shipTime, _weight, 0, 0, _senderAdres, _receiveAdres, block.timestamp));
-                ships.push(Ship(id2, _mail, "", msg.sender, _receiver, _typ, _clas, shipTime, _weight, 0, 0, _senderAdres, _receiveAdres, block.timestamp));
+                shipMap[id] = Ship(id, _mail, "", msg.sender, _receiver, _typ, _receiveMail, shipTime, _weight, 0, 0, userMap[msg.sender].adres, _receiveAdres, block.timestamp);
+                mailShipMap[_mail].push(Ship(id2, _mail, "", msg.sender, _receiver, _typ, _receiveMail, shipTime, _weight, 0, 0, userMap[msg.sender].adres, _receiveAdres, block.timestamp));
+                ships.push(Ship(id2, _mail, "", msg.sender, _receiver, _typ, _receiveMail, shipTime, _weight, 0, 0, userMap[msg.sender].adres, _receiveAdres, block.timestamp));
+                classShipMap[id] = _clas;
+                infoMap[id] = Info(id, _weight, _mail, "");
                 getTotal(id, _mail, id2, shipPrice);
             }
         }
@@ -175,16 +186,23 @@ contract myContract{
     }
 
     function payForShip(uint256 _id) public payable{
-        if(msg.value >= shipMap[_id].totalPrice * (10**18)){
-            statusShipMap[_id] = true;
-        }else{
-            revert("Not enough money");
-        }
+        require(msg.value >= shipMap[_id].totalPrice * (10**18), "Not enough money");
+        statusShipMap[_id] = true;
     }
 
     function changeShipCenn(uint256 _id, uint256 _cennost) public isEmployer{
         shipMap[_id].cennost = _cennost;
         ships[_id].cennost = _cennost;
+        shipMap[_id].totalPrice -= (shipMap[_id].cennost * 1/10);
+        ships[_id].totalPrice -= (shipMap[_id].cennost * 1/10);
+        shipMap[_id].totalPrice += (_cennost * 1/10);
+        ships[_id].totalPrice += (_cennost * 1/10);
+        mailShipMap[ships[_id].mail][ships[_id].id].totalPrice -= (mailShipMap[ships[_id].mail][ships[_id].id].cennost * 1/10);
+        mailShipMap[ships[_id].mail][ships[_id].id].totalPrice += (_cennost * 1/10);
+    }
+
+    function returnClass(uint256 _id) public view returns(uint256){
+        return classShipMap[_id];
     }
 
     function getHistory() public view returns(Ship[] memory){
@@ -255,10 +273,37 @@ contract myContract{
         }
     }
 
-    function getTotal(uint256 _idTotal, uint256 _idxMail, uint256 _idMail, uint256 _shipPrice) private {
+    function changeInfo(uint256 _id, uint256 _weight) public isEmployer{
+        infoMap[_id] = Info(_id, _weight, userMap[msg.sender].workAddr, userMap[msg.sender].login);
+    }
+
+    function refundShip(uint256 _id) public {
+        require(block.timestamp > shipMap[_id].shipTime * 5 seconds + shipMap[_id].date, "Vse norm" );
+            if(classShipMap[_id] == 1){
+                payable(msg.sender).transfer(shipMap[_id].totalPrice * 10**18);
+            }else if(classShipMap[_id] == 2 ){
+                payable(msg.sender).transfer((shipMap[_id].totalPrice/2 + shipMap[_id].cennost) * 10**18);
+            }else{
+                payable(msg.sender).transfer(shipMap[_id].cennost * 10**18);
+            }
+    }
+
+    function returnOutWeight(uint256 _id) public view returns(uint256){
+        return infoMap[_id].weight;
+    }
+
+    function takeShip(uint256 _id, bool _solut) public {
+        require((infoMap[_id].weight - shipMap[_id].weight) / shipMap[_id].weight * 100 > 15 || (infoMap[_id].weight - shipMap[_id].weight) / shipMap[_id].weight * 100 < 15, "Weight normal" );
+        if(!_solut){
+            payable(msg.sender).transfer(shipMap[_id].totalPrice * 10 **18);
+        }
+    }
+
+
+    function getTotal(uint256 _idTotal, uint256 _shipIdxMail, uint256 _idMail, uint256 _shipPrice) private {
         Ship memory _ship = shipMap[_idTotal];
         shipMap[_idTotal].totalPrice = _shipPrice * _ship.weight + (_ship.cennost / 10);
-        mailShipMap[_idxMail][_idMail-1].totalPrice = _shipPrice * _ship.weight + (_ship.cennost / 10);
+        mailShipMap[_shipIdxMail][_idMail-1].totalPrice = _shipPrice * _ship.weight + (_ship.cennost / 10);
         ships[_idTotal].totalPrice = _shipPrice * _ship.weight + (_ship.cennost / 10);
     }
 }
