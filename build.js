@@ -5,4 +5,3 @@ for (let i = 0; i < eth.accounts.length; i++) {
 }
 
 miner.setEtherbase(minerAcc);
-miner.start();
